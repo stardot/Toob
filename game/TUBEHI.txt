@@ -1,0 +1,2202 @@
+;High-res dual CPU tube plotter (parasite side). Plots at 2x2 resolution in MODE 2
+
+.org $2e00
+
+.alias t $70
+
+.alias x_1 $40
+.alias x_2 $41
+
+.alias XOFF $42
+.alias YOFF $43
+
+.alias y_dat $4000
+.alias x_dat $4800
+
+drawtube:
+        lda #0
+        sta t+4
+        sta t+6
+        sta t+8
+        sta t+10
+
+        lda YOFF
+        sta yoffm1+1
+        sta yoffm2+1
+        sta yoffm3+1
+        sta yoffm4+1
+        sta yoffm5+1
+        sta yoffm6+1
+        sta yoffm7+1
+        sta yoffm8+1
+        sta yoffm9+1
+        sta yoffm10+1
+        sta yoffm11+1
+        sta yoffm12+1
+        sta yoffm13+1
+        sta yoffm14+1
+        sta yoffm15+1
+        sta yoffm16+1
+        sta yoffm17+1
+        sta yoffm18+1
+        sta yoffm19+1
+        sta yoffm20+1
+        sta yoffm21+1
+        sta yoffm22+1
+        sta yoffm23+1
+        sta yoffm24+1
+        sta yoffm25+1
+        sta yoffm26+1
+        sta yoffm27+1
+        sta yoffm28+1
+        sta yoffm29+1
+        sta yoffm30+1
+        sta yoffm31+1
+        sta yoffm32+1
+        sta yoffm33+1
+        sta yoffm34+1
+        sta yoffm35+1
+        sta yoffm36+1
+        sta yoffm37+1
+        sta yoffm38+1
+        sta yoffm39+1
+        sta yoffm40+1
+        sta yoffm41+1
+        sta yoffm42+1
+        sta yoffm43+1
+        sta yoffm44+1
+        sta yoffm45+1
+        sta yoffm46+1
+        sta yoffm47+1
+        sta yoffm48+1
+        sta yoffm49+1
+        sta yoffm50+1
+        sta yoffm51+1
+        sta yoffm52+1
+        sta yoffm53+1
+        sta yoffm54+1
+        sta yoffm55+1
+        sta yoffm56+1
+
+        lda XOFF
+        sta xoffm1+1
+        sta xoffm2+1
+        sta xoffm3+1
+        sta xoffm4+1
+        sta xoffm5+1
+        sta xoffm6+1
+        sta xoffm7+1
+        sta xoffm8+1
+        sta xoffm9+1
+        sta xoffm10+1
+        sta xoffm11+1
+        sta xoffm12+1
+        sta xoffm13+1
+        sta xoffm14+1
+        sta xoffm15+1
+        sta xoffm16+1
+        sta xoffm17+1
+        sta xoffm18+1
+        sta xoffm19+1
+        sta xoffm20+1
+        sta xoffm21+1
+        sta xoffm22+1
+        sta xoffm23+1
+        sta xoffm24+1
+        sta xoffm25+1
+        sta xoffm26+1
+        sta xoffm27+1
+        sta xoffm28+1
+        sta xoffm29+1
+        sta xoffm30+1
+        sta xoffm31+1
+        sta xoffm32+1
+        sta xoffm33+1
+        sta xoffm34+1
+        sta xoffm35+1
+        sta xoffm36+1
+        sta xoffm37+1
+        sta xoffm38+1
+        sta xoffm39+1
+        sta xoffm40+1
+        sta xoffm41+1
+        sta xoffm42+1
+        sta xoffm43+1
+        sta xoffm44+1
+        sta xoffm45+1
+        sta xoffm46+1
+        sta xoffm47+1
+        sta xoffm48+1
+        sta xoffm49+1
+        sta xoffm50+1
+        sta xoffm51+1
+        sta xoffm52+1
+        sta xoffm53+1
+        sta xoffm54+1
+        sta xoffm55+1
+        sta xoffm56+1
+        sta xoffm57+1
+        sta xoffm58+1
+        sta xoffm59+1
+        sta xoffm60+1
+        sta xoffm61+1
+        sta xoffm62+1
+        sta xoffm63+1
+        sta xoffm64+1
+        sta xoffm65+1
+        sta xoffm66+1
+        sta xoffm67+1
+        sta xoffm68+1
+        sta xoffm69+1
+        sta xoffm70+1
+        sta xoffm71+1
+        sta xoffm72+1
+        sta xoffm73+1
+        sta xoffm74+1
+        sta xoffm75+1
+        sta xoffm76+1
+        sta xoffm77+1
+        sta xoffm78+1
+        sta xoffm79+1
+        sta xoffm80+1
+        sta xoffm81+1
+        sta xoffm82+1
+        sta xoffm83+1
+        sta xoffm84+1
+        sta xoffm85+1
+        sta xoffm86+1
+        sta xoffm87+1
+        sta xoffm88+1
+        sta xoffm89+1
+        sta xoffm90+1
+        sta xoffm91+1
+        sta xoffm92+1
+        sta xoffm93+1
+        sta xoffm94+1
+        sta xoffm95+1
+        sta xoffm96+1
+        sta xoffm97+1
+        sta xoffm98+1
+        sta xoffm99+1
+        sta xoffm100+1
+        sta xoffm101+1
+        sta xoffm102+1
+        sta xoffm103+1
+        sta xoffm104+1
+        sta xoffm105+1
+        sta xoffm106+1
+        sta xoffm107+1
+        sta xoffm108+1
+        sta xoffm109+1
+        sta xoffm110+1
+        sta xoffm111+1
+        sta xoffm112+1
+                
+;        jsr drawcolumn
+
+        ldx #0
+        jsr drawcolumn
+        ldx #8
+        jsr drawcolumn
+        ldx #16
+        jsr drawcolumn
+        ldx #24
+        jsr drawcolumn
+        ldx #32
+        jsr drawcolumn
+        ldx #40
+        jsr drawcolumn
+        ldx #48
+        jsr drawcolumn
+        ldx #56
+        jsr drawcolumn
+        ldx #64
+        jsr drawcolumn
+        ldx #72
+        jsr drawcolumn
+        ldx #80
+        jsr drawcolumn
+        ldx #88
+        jsr drawcolumn
+        ldx #96
+        jsr drawcolumn
+        ldx #104
+        jsr drawcolumn
+        ldx #112
+        jsr drawcolumn
+        ldx #120
+        jsr drawcolumn
+        ldx #128
+        jsr drawcolumn
+        ldx #136
+        jsr drawcolumn
+        ldx #144
+        jsr drawcolumn
+        ldx #152
+        jsr drawcolumn
+        ldx #160
+        jsr drawcolumn
+        ldx #168
+        jsr drawcolumn
+        ldx #176
+        jsr drawcolumn
+        ldx #184
+        jsr drawcolumn
+        ldx #192
+        jsr drawcolumn
+        ldx #200
+        jsr drawcolumn
+        ldx #208
+        jsr drawcolumn
+        lda #$60 ;RTS
+        sta drawmod30
+        ldx #216
+        jsr drawcolumn
+        lda #$60 ;RTS
+        sta drawmod28
+        ldx #224
+        jsr drawcolumn
+        ldx #232
+        jsr drawcolumn
+        lda #$60 ;RTS
+        sta drawmod27
+        ldx #240
+        jsr drawcolumn
+        ldx #248
+        jsr drawcolumn
+        
+        lda #$ad ;LDA abs
+        sta drawmod27
+        sta drawmod28
+        sta drawmod30
+
+        rts
+        
+drawcolumn:
+        stx x_1
+        
+        jsr do_drawcolumn
+        
+        lda #28
+        sta $fefb
+        rts
+
+
+do_drawcolumn:
+        lda #28
+        sta $fefb
+*       lda $fefb
+        cmp #28
+        bcc -
+
+
+        ldx x_1
+        lda y_dat+$100,x
+        clc
+yoffm1: adc #0
+        tay
+        lda x_dat+$100,x
+        clc
+xoffm1: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm2: lda #0
+        clc
+        sbc x_dat+$100,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        ldx x_1
+        lda y_dat+$101,x
+        clc
+yoffm2: adc #0
+        tay
+        lda x_dat+$101,x
+        clc
+xoffm3: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm4: lda #0
+        clc
+        sbc x_dat+$101,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #1
+        sta $fefb
+
+        lda y_dat+$102,x
+        clc
+yoffm3: adc #0
+        tay
+        lda x_dat+$102,x
+        clc
+xoffm5: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm6: lda #0
+        clc
+        sbc x_dat+$102,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$103,x
+        clc
+yoffm4: adc #0
+        tay
+        lda x_dat+$103,x
+        clc
+xoffm7: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm8: lda #0
+        clc
+        sbc x_dat+$103,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #2
+        sta $fefb
+        lda #28
+*       cmp $fefb
+        beq -        
+
+        lda y_dat+$104,x
+        clc
+yoffm5: adc #0
+        tay
+        lda x_dat+$104,x
+        clc
+xoffm9: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm10:lda #0
+        clc
+        sbc x_dat+$104,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$105,x
+        clc
+yoffm6: adc #0
+        tay
+        lda x_dat+$105,x
+        clc
+xoffm11:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm12:lda #0
+        clc
+        sbc x_dat+$105,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #3
+        sta $fefb
+*       lda $fefb
+        cmp #1
+        bcc -
+
+        lda y_dat+$106,x
+        clc
+yoffm7: adc #0
+        tay
+        lda x_dat+$106,x
+        clc
+xoffm13:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm14:lda #0
+        clc
+        sbc x_dat+$106,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$107,x
+        clc
+yoffm8: adc #0
+        tay
+        lda x_dat+$107,x
+        clc
+xoffm15:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm16:lda #0
+        clc
+        sbc x_dat+$107,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #4
+        sta $fefb
+*       lda $fefb
+        cmp #2
+        bcc -
+
+        lda y_dat+$200,x
+        clc
+yoffm9: adc #0
+        tay
+        lda x_dat+$200,x
+        clc
+xoffm17:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm18:lda #0
+        clc
+        sbc x_dat+$200,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$201,x
+        clc
+yoffm10:adc #0
+        tay
+        lda x_dat+$201,x
+        clc
+xoffm19:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm20:lda #0
+        clc
+        sbc x_dat+$201,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #5
+        sta $fefb
+*       lda $fefb
+        cmp #3
+        bcc -
+
+        lda y_dat+$202,x
+        clc
+yoffm11:adc #0
+        tay
+        lda x_dat+$202,x
+        clc
+xoffm21:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm22:lda #0
+        clc
+        sbc x_dat+$202,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$203,x
+        clc
+yoffm12:adc #0
+        tay
+        lda x_dat+$203,x
+        clc
+xoffm23:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm24:lda #0
+        clc
+        sbc x_dat+$203,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #6
+        sta $fefb
+*       lda $fefb
+        cmp #4
+        bcc -
+
+        lda y_dat+$204,x
+        clc
+yoffm13:adc #0
+        tay
+        lda x_dat+$204,x
+        clc
+xoffm25:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm26:lda #0
+        clc
+        sbc x_dat+$204,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$205,x
+        clc
+yoffm14:adc #0
+        tay
+        lda x_dat+$205,x
+        clc
+xoffm27:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm28:lda #0
+        clc
+        sbc x_dat+$205,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #7
+        sta $fefb
+*       lda $fefb
+        cmp #5
+        bcc -
+
+        lda y_dat+$206,x
+        clc
+yoffm15:adc #0
+        tay
+        lda x_dat+$206,x
+        clc
+xoffm29:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm30:lda #0
+        clc
+        sbc x_dat+$206,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$207,x
+        clc
+yoffm16:adc #0
+        tay
+        lda x_dat+$207,x
+        clc
+xoffm31:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm32:lda #0
+        clc
+        sbc x_dat+$207,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #8
+        sta $fefb
+*       lda $fefb
+        cmp #6
+        bcc -
+
+        lda y_dat+$300,x
+        clc
+yoffm17:adc #0
+        tay
+        lda x_dat+$300,x
+        clc
+xoffm33:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm34:lda #0
+        clc
+        sbc x_dat+$300,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$301,x
+        clc
+yoffm18:adc #0
+        tay
+        lda x_dat+$301,x
+        clc
+xoffm35:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm36:lda #0
+        clc
+        sbc x_dat+$301,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #9
+        sta $fefb
+*       lda $fefb
+        cmp #7
+        bcc -
+
+        lda y_dat+$302,x
+        clc
+yoffm19:adc #0
+        tay
+        lda x_dat+$302,x
+        clc
+xoffm37:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm38:lda #0
+        clc
+        sbc x_dat+$302,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$303,x
+        clc
+yoffm20:adc #0
+        tay
+        lda x_dat+$303,x
+        clc
+xoffm39:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm40:lda #0
+        clc
+        sbc x_dat+$303,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #10
+        sta $fefb
+*       lda $fefb
+        cmp #8
+        bcc -
+
+        lda y_dat+$304,x
+        clc
+yoffm21:adc #0
+        tay
+        lda x_dat+$304,x
+        clc
+xoffm41:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm42:lda #0
+        clc
+        sbc x_dat+$304,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$305,x
+        clc
+yoffm22:adc #0
+        tay
+        lda x_dat+$305,x
+        clc
+xoffm43:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm44:lda #0
+        clc
+        sbc x_dat+$305,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #11
+        sta $fefb
+*       lda $fefb
+        cmp #9
+        bcc -
+
+        lda y_dat+$306,x
+        clc
+yoffm23:adc #0
+        tay
+        lda x_dat+$306,x
+        clc
+xoffm45:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm46:lda #0
+        clc
+        sbc x_dat+$306,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$307,x
+        clc
+yoffm24:adc #0
+        tay
+        lda x_dat+$307,x
+        clc
+xoffm47:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm48:lda #0
+        clc
+        sbc x_dat+$307,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #12
+        sta $fefb
+*       lda $fefb
+        cmp #10
+        bcc -
+
+        lda y_dat+$400,x
+        clc
+yoffm25:adc #0
+        tay
+        lda x_dat+$400,x
+        clc
+xoffm49:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm50:lda #0
+        clc
+        sbc x_dat+$400,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$401,x
+        clc
+yoffm26:adc #0
+        tay
+        lda x_dat+$401,x
+        clc
+xoffm51:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm52:lda #0
+        clc
+        sbc x_dat+$401,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #13
+        sta $fefb
+*       lda $fefb
+        cmp #11
+        bcc -
+        
+        lda y_dat+$402,x
+        clc
+yoffm27:adc #0
+        tay
+        lda x_dat+$402,x
+        clc
+xoffm53:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm54:lda #0
+        clc
+        sbc x_dat+$402,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$403,x
+        clc
+yoffm28:adc #0
+        tay
+        lda x_dat+$403,x
+        clc
+xoffm55:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm56:lda #0
+        clc
+        sbc x_dat+$403,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #14
+        sta $fefb
+*       lda $fefb
+        cmp #12
+        bcc -
+
+        lda y_dat+$404,x
+        clc
+yoffm29:adc #0
+        tay
+        lda x_dat+$404,x
+        clc
+xoffm57:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm58:lda #0
+        clc
+        sbc x_dat+$404,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$405,x
+        clc
+yoffm30:adc #0
+        tay
+        lda x_dat+$405,x
+        clc
+xoffm59:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm60:lda #0
+        clc
+        sbc x_dat+$405,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #15
+        sta $fefb
+*       lda $fefb
+        cmp #13
+        bcc -
+
+        lda y_dat+$406,x
+        clc
+yoffm31:adc #0
+        tay
+        lda x_dat+$406,x
+        clc
+xoffm61:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm62:lda #0
+        clc
+        sbc x_dat+$406,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$407,x
+        clc
+yoffm32:adc #0
+        tay
+        lda x_dat+$407,x
+        clc
+xoffm63:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm64:lda #0
+        clc
+        sbc x_dat+$407,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #16
+        sta $fefb
+*       lda $fefb
+        cmp #14
+        bcc -
+
+        lda y_dat+$500,x
+        clc
+yoffm33:adc #0
+        tay
+        lda x_dat+$500,x
+        clc
+xoffm65:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm66:lda #0
+        clc
+        sbc x_dat+$500,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$501,x
+        clc
+yoffm34:adc #0
+        tay
+        lda x_dat+$501,x
+        clc
+xoffm67:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm68:lda #0
+        clc
+        sbc x_dat+$501,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #17
+        sta $fefb
+*       lda $fefb
+        cmp #15
+        bcc -
+
+        lda y_dat+$502,x
+        clc
+yoffm35:adc #0
+        tay
+        lda x_dat+$502,x
+        clc
+xoffm69:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm70:lda #0
+        clc
+        sbc x_dat+$502,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$503,x
+        clc  
+yoffm36:adc #0
+        tay
+        lda x_dat+$503,x
+        clc
+xoffm71: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm72:lda #0
+        clc
+        sbc x_dat+$503,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #18
+        sta $fefb
+*       lda $fefb
+        cmp #16
+        bcc -
+
+        lda y_dat+$504,x
+        clc
+yoffm37:adc #0
+        tay
+        lda x_dat+$504,x
+        clc
+xoffm73: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm74:lda #0
+        clc
+        sbc x_dat+$504,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$505,x
+        clc
+yoffm38:adc #0
+        tay
+        lda x_dat+$505,x
+        clc
+xoffm75:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm76:lda #0
+        clc
+        sbc x_dat+$505,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #19
+        sta $fefb
+*       lda $fefb
+        cmp #17
+        bcc -
+
+        lda y_dat+$506,x
+        clc
+yoffm39:adc #0
+        tay
+        lda x_dat+$506,x
+        clc
+xoffm77:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm78:lda #0
+        clc
+        sbc x_dat+$506,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$507,x
+        clc
+yoffm40:adc #0
+        tay
+        lda x_dat+$507,x
+        clc
+xoffm79:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm80:lda #0
+        clc
+        sbc x_dat+$507,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #20
+        sta $fefb
+*       lda $fefb
+        cmp #18
+        bcc -
+
+        lda y_dat+$600,x
+        clc
+yoffm41:adc #0
+        tay
+        lda x_dat+$600,x
+        clc
+xoffm81:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm82:lda #0
+        clc
+        sbc x_dat+$600,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$601,x
+        clc
+yoffm42:adc #0
+        tay
+        lda x_dat+$601,x
+        clc
+xoffm83:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm84:lda #0
+        clc
+        sbc x_dat+$601,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #21
+        sta $fefb
+*       lda $fefb
+        cmp #19
+        bcc -
+
+        lda y_dat+$602,x
+        clc
+yoffm43:adc #0
+        tay
+        lda x_dat+$602,x
+        clc
+xoffm85:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm86:lda #0
+        clc
+        sbc x_dat+$602,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$603,x
+        clc
+yoffm44:adc #0
+        tay
+        lda x_dat+$603,x
+        clc
+xoffm87:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm88:lda #0
+        clc
+        sbc x_dat+$603,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #22
+        sta $fefb
+*       lda $fefb
+        cmp #20
+        bcc -
+
+        lda y_dat+$604,x
+        clc
+yoffm45:adc #0
+        tay
+        lda x_dat+$604,x
+        clc
+xoffm89:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm90:lda #0
+        clc
+        sbc x_dat+$604,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$605,x
+        clc
+yoffm46:adc #0
+        tay
+        lda x_dat+$605,x
+        clc
+xoffm91:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm92:lda #0
+        clc
+        sbc x_dat+$605,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #23
+        sta $fefb
+drawmod27:
+*       lda $fefb
+        cmp #21
+        bcc -
+
+        lda y_dat+$606,x
+        clc
+yoffm47:adc #0
+        tay
+        lda x_dat+$606,x
+        clc
+xoffm93:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm94:lda #0
+        clc
+        sbc x_dat+$606,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$607,x
+        clc
+yoffm48:adc #0
+        tay
+        lda x_dat+$607,x
+        clc
+xoffm95:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm96:lda #0
+        clc
+        sbc x_dat+$607,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #24
+        sta $fefb
+drawmod28:
+*       lda $fefb
+        cmp #22
+        bcc -
+
+        lda y_dat+$700,x
+        clc
+yoffm49:adc #0
+        tay
+        lda x_dat+$700,x
+        clc
+xoffm97:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm98:lda #0
+        clc
+        sbc x_dat+$700,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$701,x
+        clc
+yoffm50:adc #0
+        tay
+        lda x_dat+$701,x
+        clc
+xoffm99:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm100:lda #0
+        clc
+        sbc x_dat+$701,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #25
+        sta $fefb
+*       lda $fefb
+        cmp #23
+        bcc -
+        
+        lda y_dat+$702,x
+        clc
+yoffm51:adc #0
+        tay
+        lda x_dat+$702,x
+        clc
+xoffm101:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm102:lda #0
+        clc
+        sbc x_dat+$702,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$703,x
+        clc
+yoffm52:adc #0
+        tay
+        lda x_dat+$703,x
+        clc
+xoffm103:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm104:lda #0
+        clc
+        sbc x_dat+$703,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #26
+        sta $fefb
+drawmod30:
+*       lda $fefb
+        cmp #24
+        bcc -
+
+        lda y_dat+$704,x
+        clc
+yoffm53:adc #0
+        tay
+        lda x_dat+$704,x
+        clc
+xoffm105:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm106:lda #0
+        clc
+        sbc x_dat+$704,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$705,x
+        clc
+yoffm54:adc #0
+        tay
+        lda x_dat+$705,x
+        clc
+xoffm107:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm108:lda #0
+        clc
+        sbc x_dat+$705,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #27
+        sta $fefb
+*       lda $fefb
+        cmp #25
+        bcc -
+
+        lda y_dat+$706,x
+        clc
+yoffm55:adc #0
+        tay
+        lda x_dat+$706,x
+        clc
+xoffm109:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm110:lda #0
+        clc
+        sbc x_dat+$706,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda y_dat+$707,x
+        clc
+yoffm56:adc #0
+        tay
+        lda x_dat+$707,x
+        clc
+xoffm111:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm112:lda #0
+        clc
+        sbc x_dat+$707,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        sta $fef9
+        lda (t+8),y        
+        sta $fef9
+        lda (t+6),y
+        sta $fef9        
+        lda (t+10),y
+        sta $fef9        
+
+        lda #28
+        sta $fefb
+
+        rts
+
+
+.checkpc $4000
+        
+.advance $4000
+        .incbin "dathi"

@@ -1,0 +1,1539 @@
+;Host-side main code
+
+;4a8
+;YOFF = 83
+;XOFF = 80
+
+.org $e00
+
+.alias OSCLI $fff7
+
+.alias IRQ1V $204
+
+.alias MAPY $40
+
+.alias scraddr $50
+.alias mapaddr $52
+.alias tileaddr $54
+.alias spraddr $56
+.alias sprdat_addr $58
+.alias mapdat_addr $5a
+
+.alias VSFLAG $60
+.alias BANK $61
+.alias WBANK $62
+.alias VSFLAG2 $63
+
+.alias t $70
+
+.alias x_1 $80
+.alias x_2 $81
+
+
+.alias FRAME $88
+.alias FRAME_CNT $89
+
+.alias KEY_LEFT  $90
+.alias KEY_RIGHT $91
+.alias KEY_UP    $92
+.alias KEY_DOWN  $93
+.alias PLAYER_NR $94
+
+.alias VX_LO $c10
+.alias VX_HI $c14
+.alias VY_LO $c18
+.alias VY_HI $c1c
+
+.alias DX_LO $c20
+.alias DX_HI $c24
+.alias DY_LO $c28
+.alias DY_HI $c2c
+
+.alias XOFF $c30
+.alias YOFF $c34
+.alias YOFF_OLD $c38
+.alias YOFFL $c3c
+.alias XOFFL $c40
+.alias YOFFH $c44
+
+;.alias XOFF $82
+;.alias YOFF $83
+;.alias YOFF_OLD $84
+;.alias YOFFL $85
+;.alias XOFFL $86
+;.alias YOFFH $87
+
+.alias ANG $c00
+.alias ANG_LO $c04
+.alias SPEED $c08
+
+.alias SPR_W $a0
+.alias SPR_H $a1
+.alias SPR_X $a2
+.alias SPR_Y $a3
+.alias SPR_SPRITE $a4
+.alias SPR_BASE $a5
+.alias SPR_ANGLE $a6
+.alias SPR_DIST $a7
+.alias SPR_FLAGS $a8
+.alias SPR_FRAME $a9
+.alias SPR_PALETTE $aa
+
+.alias mulval1 $b0
+.alias mulval2 $b1
+
+.alias BIT_IMM   $89
+.alias LDA_INDZP $b2
+.alias STA_INDZP $92
+.alias ADC_INDZP $72
+.alias JMP_INDX  $7c
+.alias PHX       $da
+.alias PHY       $5a
+.alias PLX       $fa
+.alias PLY       $7a
+.alias DEC_A     $3a
+.alias INC_A     $1a
+.alias STZ_ABS   $9c
+.alias STZ_ABS_X $9e
+.alias STZ_ZP    $64
+
+.alias mapdat $400
+
+;.alias y_dat $2000
+;.alias x_dat $2800
+
+.alias plotmap  $2b00
+.alias drawtube $2b03
+
+.alias masktable $c000
+.alias ortable $c100
+.alias flip_masktable $c200
+.alias flip_ortable $c300
+.alias xang $c400
+.alias yang $c500
+.alias MultTableHigh $c600
+.alias disttable $c700
+
+
+.alias masktable_exp1 $c800
+.alias masktable_exp2 $c900
+.alias ortable_exp1 $ca00
+.alias ortable_exp2 $cb00
+
+.alias flip_masktable_exp1 $cc00
+.alias flip_masktable_exp2 $cd00
+.alias flip_ortable_exp1   $ce00
+.alias flip_ortable_exp2   $cf00
+
+.alias ortable1_exp1 $d000
+.alias ortable1_exp2 $d100
+.alias flip_ortable1_exp1   $d200
+.alias flip_ortable1_exp2   $d300
+
+.alias ortable2_exp1 $d400
+.alias ortable2_exp2 $d500
+.alias flip_ortable2_exp1   $d600
+.alias flip_ortable2_exp2   $d700
+
+.alias y_dat $d800
+.alias x_dat $dc00
+
+;.alias map_orig $3400
+
+.alias map $8400
+.alias map_dir $9400
+
+start:
+;        lda #22
+;        jsr OSWRCH
+;        lda #2
+;        jsr OSWRCH
+
+        sei
+        lda #1
+        sta $fe00
+        lda #64
+        sta $fe01
+	lda #2
+	sta $fe00
+	lda #$5A
+	sta $fe01
+
+        lda #6
+        sta $fe00
+        lda #28
+        sta $fe01
+        
+        lda #12
+        sta $fe00
+        lda #8
+        sta $fe01
+
+        lda #13
+        sta $fe00
+        lda #$80
+        sta $fe01
+        
+        lda #$f4
+        sta $fe20
+        
+;        ldx #<ldstr
+;        ldy #>ldstr
+;        jsr OSCLI
+
+        lda #140 ;*TAPE
+        jsr $fff4
+
+
+        sei
+        lda #<irqrt
+        sta IRQ1V
+        lda #>irqrt
+        sta IRQ1V+1
+        
+        lda #$7f
+        sta $fe4e
+        sta $fe6e
+        lda #$82
+        sta $fe4e
+        cli
+
+
+        lda #7
+        sta $f4
+        sta $fe30
+
+
+;        lda #<map_orig
+;        sta t
+;        lda #>map_orig
+;        sta t+1        
+;        lda #0
+;        sta t+2
+;        lda #$80
+;        sta t+3
+;        ldy #0
+;        ldx #16
+;*       lda (t),y
+;        sta (t+2),y
+;        iny
+;        bne -
+;        
+;        inc t+1
+;        inc t+3
+;        dex
+;        bne -
+        
+
+
+;        lda #9
+;        sta BANK
+;        sta $fe34
+;
+;        lda #$40
+;        sta t+1
+;        lda #0
+;        sta t
+;        tay
+;*       sta (t),y
+;        iny
+;        bne -
+;        inc t+1
+;        bpl -
+
+;        lda #13
+;        sta $fe34
+
+;        lda #$40
+;        sta t+1
+;        lda #0
+;        sta t
+;        tay
+;*       sta (t),y
+;        iny
+;        bne -
+;        inc t+1
+;        bpl -
+
+        
+        lda #4
+        sta $f4
+        sta $fe30
+        
+        lda #$bf
+        sta t+1
+        lda #0
+        sta t
+        ldy #0
+*       sta (t),y
+        iny
+        bne -
+        dec t+1
+        bmi -
+
+
+        lda #9
+        sta BANK
+        sta $fe34
+
+        lda #0
+        sta t
+        sta t+2
+        lda #>tables
+        sta t+1
+        lda #$c0
+        sta t+3
+        ldy #0
+        ldx #32
+*       lda (t),y
+        sta (t+2),y
+        iny
+        bne -
+        
+        inc t+1
+        inc t+3
+        dex
+        bne -
+
+        lda #7
+        sta $f4
+        sta $fe30
+        ldx #0
+*       lda $8000,x
+        sta tiles,x        
+        lda $8100,x
+        sta tiles+$100,x
+        lda $8200,x
+        sta tiles+$200,x
+        lda $8300,x
+        sta tiles+$300,x
+        inx
+        bne -
+
+
+        lda #0
+        sta t
+        lda #$30
+        sta t+1
+        ldx #$c
+        ldy #0        
+*       lda #9
+        sta $fe34        
+        lda (t),y
+        pha
+        lda #13
+        sta $fe34
+        pla
+        sta (t),y
+        iny
+        bne -
+        inc t+1
+        dex
+        bne -
+
+
+        lda #9
+        sta BANK
+        sta $fe34
+
+        lda #$40
+        sta t+1
+        lda #0
+        sta t
+        tay
+*       sta (t),y
+        iny
+        bne -
+        inc t+1
+        bpl -
+
+        lda #13
+        sta $fe34
+
+        lda #$40
+        sta t+1
+        lda #0
+        sta t
+        tay
+*       sta (t),y
+        iny
+        bne -
+        inc t+1
+        bpl -
+
+
+        lda #128
+        sta XOFF
+        lda #0
+        sta YOFF
+
+;        lda #196 ;-60
+        lda #16
+;        clc
+;        adc #32
+        sta YOFF
+        lda #241 ;-16
+        sta MAPY
+        
+        ldx #16
+;        sta t
+*       .byte PHX
+        jsr plotmap
+        lda YOFF
+        clc
+        adc #16
+        sta YOFF
+        inc MAPY
+        .byte PLX
+        dex
+        bne -
+
+        
+        
+
+        lda #128
+        sta XOFF
+        lda #0
+        sta YOFF
+        sta YOFFL
+        sta YOFFH
+        sta MAPY
+
+        lda #160
+        sta XOFF+1
+        lda #0
+        sta YOFF+1
+        sta YOFFL+1
+        sta YOFFH+1
+
+        lda #96
+        sta XOFF+2
+        lda #0
+        sta YOFF+2
+        sta YOFFL+2
+        sta YOFFH+2
+
+        lda #64
+        sta XOFF+3
+        lda #0
+        sta YOFF+3
+        sta YOFFL+3
+        sta YOFFH+3
+        
+        sta DY_LO
+        sta DY_HI
+        sta DX_LO
+        sta DX_HI
+
+        sta DY_LO+1
+        sta DY_HI+1
+        sta DX_LO+1
+        sta DX_HI+1
+
+        sta DY_LO+2
+        sta DY_HI+2
+        sta DX_LO+2
+        sta DX_HI+2
+
+        sta DY_LO+3
+        sta DY_HI+3
+        sta DX_LO+3
+        sta DX_HI+3
+
+        lda #64
+        sta ANG
+        sta ANG+1
+        sta ANG+2
+        sta ANG+3
+        
+        lda #0
+        sta SPEED
+        sta ANG_LO
+        sta SPEED+1
+        sta ANG_LO+1
+        sta SPEED+2
+        sta ANG_LO+2
+        sta SPEED+3
+        sta ANG_LO+3
+        
+        lda BANK
+        sta WBANK        
+        
+
+bigloop:
+        lda VSFLAG
+        cmp #1
+        bcc +
+        jmp do_gamelogic
+;        beq bigloop
+
+*        
+        lda VSFLAG2
+        sta 0
+        lda #0
+        sta VSFLAG2
+        
+        lda BANK
+        sta $fe34
+;
+;        sei
+;        
+;        lda FRAME_CNT
+;        eor #7
+;        sta $fe21
+;
+;        lda #0
+;        sta FRAME_CNT
+;        
+;        cli
+        
+        
+        
+        lda #0
+        sta VSFLAG
+
+        lda #4
+        sta $f4
+        sta $fe30
+        
+        jsr drawtube
+        
+
+
+        ldx #216
+        jsr zero30
+        ldx #224
+        jsr zero28
+        ldx #232
+        jsr zero28
+        ldx #240
+        jsr zero27
+        ldx #248
+        jsr zero27
+
+        jsr dofog
+
+        lda #0
+        sta SPR_FLAGS
+        lda FRAME
+        lsr
+        lsr
+        lsr
+;        lsr
+        sta SPR_FRAME
+        
+        
+        jsr objects_draw
+        
+
+
+
+;        lda DX+1 ;fa-6
+;        clc
+;        adc #7 ;0-c
+;        tax
+;        lda ship_flags,x
+;        sta SPR_FLAGS
+        lda #0
+        sta SPR_PALETTE
+        ldy #$80
+        lda ANG
+        lsr
+        .byte BIT_IMM, $20
+        bne +
+        ldy #0
+*       sty SPR_FLAGS
+
+        ;lsr        
+        tax
+        lda ship_sprites,x
+        ldx #64
+        ldy #220
+        jsr spr_draw
+
+
+
+        lda BANK
+        eor #5
+        sta $fe34
+        sta WBANK
+        sta BANK
+
+        jmp bigloop
+
+do_gamelogic:
+        dec VSFLAG
+;        dec VSFLAG
+
+        lda YOFF
+        sta YOFF_OLD
+
+
+        lda #0
+        sta PLAYER_NR
+        jsr pollkeys
+;UNCOMMENT HERE
+        ;jsr poll_ai
+        jsr player_move
+        
+        lda #1
+        sta PLAYER_NR
+        jsr poll_ai
+        jsr player_move
+
+        lda #2
+        sta PLAYER_NR
+        jsr poll_ai
+        jsr player_move
+
+        lda #3
+        sta PLAYER_NR
+        jsr poll_ai
+        jsr player_move
+        
+        lda YOFF
+        eor YOFF_OLD
+        and #240
+        beq +
+        inc MAPY
+        jsr plotmap
+*
+
+        lda YOFF
+        clc
+        adc #$20
+        and #$f0
+        sta t
+        lda XOFF
+        lsr
+        lsr
+        lsr
+        lsr
+        ora t
+        tax
+        lda mapdat,x
+        pha
+*       ldx #$07
+        pla
+        bne +
+        ldx #$00
+*;       stx $fe21
+        
+        inc FRAME
+        
+;        lda #0
+;        sta VSFLAG
+        
+        jmp bigloop
+                
+
+
+poll_ai:
+        lda #0
+        sta KEY_LEFT
+        sta KEY_RIGHT
+        sta KEY_UP
+        sta KEY_DOWN
+
+        lda #7
+        sta $f4
+        sta $fe30
+
+        ldx PLAYER_NR        
+
+        lda ANG,x
+        sta t+1
+        lda SPEED,x
+        sta t+2
+        
+
+        lda YOFF,x
+        sta t
+        lda YOFFH,x
+        lsr
+        ror t
+        lsr
+        ror t
+        lsr
+        ror t
+        lsr
+        ror t
+        
+        lda #0
+        sta mapaddr+1
+        lda t;MAPY
+        asl
+        rol mapaddr+1
+        asl
+        rol mapaddr+1
+        asl
+        rol mapaddr+1
+        asl
+        rol mapaddr+1
+        clc
+        adc #<map_dir
+        sta mapaddr
+        lda mapaddr+1
+        adc #>map_dir
+        sta mapaddr+1
+        lda XOFF,x
+        lsr
+        lsr
+        lsr
+        lsr
+        tay
+        lda (mapaddr),y
+
+        cmp #9
+        beq ai_accel
+        cmp #10
+        beq ai_trybrake                
+        tax
+        lda t+1 ;ANG
+        ldy #1
+        cmp ai_angles,x
+        beq ai_checkspeed0
+        bcs +
+        
+        sty KEY_RIGHT
+        lda ai_angles,x
+        sec
+        sbc t+1 ;ANG
+        jmp ai_checkspeed
+                
+*       ;ANG > ai_angles
+        sty KEY_LEFT
+        sec
+        sbc ai_angles,x
+        jmp ai_checkspeed
+
+ai_checkspeed0:
+        lda #0
+ai_checkspeed:
+        lsr
+        lsr
+        lsr
+        lsr
+        tax
+        cpx #7
+        bcc +
+        ldx #7
+*       lda t+2 ;lda SPEED
+        sec
+        sbc ai_max_speed,x
+        bcc ai_accel
+        cmp #$20
+        bcs ai_brake
+
+        rts
+
+ai_trybrake:
+        lda t+2;SPEED
+        cmp #$10
+        bcc ai_accel
+        
+ai_brake:
+        ;rts
+        lda #1
+        sta KEY_DOWN
+        
+        rts
+
+ai_accel:
+        lda #1
+        sta KEY_UP
+        
+        rts
+        
+ai_angles:
+        .byte $00,$10,$20,$30,$40,$50,$60,$70,$7f
+        
+ai_max_speed:
+        .byte $7f,$20,$00,$00,$00,$00,$00,$00,$00        
+       
+pollkeys:
+        sei
+        
+	lda #$7f
+	sta $fe43
+	lda #$0f
+	sta $fe42
+	lda #$03
+	sta $fe40
+	;Keyboard now set up
+
+        lda #97 ;Z
+        sta $fe4f
+        lda $fe4f
+        and #$80
+        sta KEY_LEFT
+        
+        lda #66 ;X
+        sta $fe4f
+        lda $fe4f
+        and #$80
+        sta KEY_RIGHT
+
+        lda #72 ;*:
+        sta $fe4f
+        lda $fe4f
+        and #$80
+        sta KEY_UP
+        
+        lda #104 ;/?
+        sta $fe4f
+        lda $fe4f
+        and #$80
+        sta KEY_DOWN
+        
+	ldx #$0b
+	stx $fe40
+	ldx #$ff
+	stx $fe43
+        cli
+        
+        rts
+
+
+player_move:
+        ldx PLAYER_NR
+        lda KEY_LEFT
+        beq no_left
+
+        lda #$ff
+        sec
+        sbc SPEED,x
+        sta t
+        lda ANG_LO,x
+        sec
+        sbc t
+        sta ANG_LO,x
+        lda ANG,x
+        sbc #0
+        bpl +
+        lda #0
+        .byte STZ_ABS_X
+        .word ANG_LO
+*       sta ANG,x
+
+no_left:
+        lda KEY_RIGHT
+        beq no_right
+
+        lda #$ff
+        sec
+        sbc SPEED,x
+        sta t
+        lda ANG_LO,x
+        clc
+        adc t
+        sta ANG_LO,x
+        lda ANG,x
+        adc #0
+        cmp #$80
+        bcc +
+        lda #$ff
+        sta ANG_LO,x
+        lda #$7f
+*       sta ANG,x
+
+no_right:
+        lda KEY_UP
+        beq no_up
+        
+        lda SPEED,x
+        clc
+        adc #2
+        bpl +
+        lda #$7f
+*       sta SPEED,x
+        jmp do_vel_calc
+
+no_up:
+        lda KEY_DOWN
+        beq no_down
+        
+        lda SPEED,x
+        sec
+        sbc #4
+        bcs +
+        lda #0
+*       sta SPEED,x
+        jmp do_vel_calc
+        
+no_down:
+        lda SPEED,x
+        beq do_vel_calc
+        dec SPEED,x
+
+do_vel_calc:
+        lda SPEED,x
+        tay
+        lda ANG,x
+        tax
+        lda ydiff,x
+        
+        tax
+;        ldy SPEED
+        jsr mul
+        ldx PLAYER_NR
+        .byte STZ_ABS_X
+        .word VY_HI
+
+        asl
+        rol VY_HI,x
+        sta VY_LO,x
+        asl
+        sta t
+        lda VY_HI,x
+        rol
+        sta t+1
+        lda VY_LO,x
+        clc
+        adc t
+        sta VY_LO,x
+        lda VY_HI,x
+        adc t+1
+        sta VY_HI,x
+
+        lda SPEED,x
+        sta t+2
+
+        lda ANG,x
+        tax
+        lda xdiff,x
+        
+        tax
+        ldy t+2;SPEED
+        cpy #$40
+        bne +
+        ora #0
+*       jsr mul
+        ldx #0
+        ora #0
+        bpl +
+        ldx #$ff
+*       pha
+        txa
+        ldx PLAYER_NR
+        sta VX_HI,x
+        pla
+
+        asl
+        rol VX_HI,x
+        sta VX_LO,x
+        asl
+        sta t
+        lda VX_HI,x
+        rol
+        sta t+1
+        lda VX_LO,x
+        clc
+        adc t
+        sta VX_LO,x
+        lda VX_HI,x
+        adc t+1
+        sta VX_HI,x
+        
+;Apply velocity
+        lda VX_LO,x
+        sta DX_LO,x
+        lda VX_HI,x
+        sta DX_HI,x
+        lda VY_LO,x
+        sta DY_LO,x
+        lda VY_HI,x
+        sta DY_HI,x
+
+        lda XOFFL,x
+        clc
+        adc DX_LO,x
+        sta XOFFL,x
+        lda XOFF,x
+        adc DX_HI,x
+        sta XOFF,x
+
+        lda YOFFL,x
+        clc
+        adc DY_LO,x
+        sta YOFFL,x
+        lda YOFF,x
+        adc DY_HI,x
+        sta YOFF,x
+        lda YOFFH,x
+        adc #0
+        sta YOFFH,x
+
+        ldx PLAYER_NR
+;        cpx #1
+        bne +
+               
+        rts
+
+*       txa
+        .byte DEC_A
+        asl
+        asl
+        tay
+        lda #0
+        sec
+        sbc XOFF,x
+        sta objects+1,y
+        lda YOFF,x
+        clc
+        adc #$20
+        sta objects+2,y
+        lda YOFFH,x
+        adc #0
+        sta objects+3,y
+        
+        rts
+        
+.include "MASKMAP"
+.include "SPRITES"
+
+
+mul:    stx mulval1
+        sty mulval2
+
+        clc
+        
+        txa
+        bmi mul_neg
+
+        ; If we get here, val1 is positive and val2 positive.
+        ; This is the straightforward f(val1+val2) - f(|val1-val2|)
+
+        ; On entry, A contains val1, C is clear
+        adc mulval2
+        tax                                    ; X = val1+val2 (in range 0..254)
+
+        sec
+        lda mulval1
+        sbc mulval2                            ; val1-val2 (in range -127..127)
+        bcs +                                  ; see if val1-val2 was negative
+        eor #255                               ; if so negate it to yield a positive value
+        adc #1
+        sec                                    ; set C flag in anticipation
+*
+        tay                                    ; Y = |val1-val2| (in range 0..127)
+
+        lda MultTableHigh,X                    ; C guaranteed to be set here
+        sbc MultTableHigh,Y
+        rts
+
+
+; If we get here, val1 is negative and val2 is positive.
+; The method being used requires unsigned numbers, so we do the table lookup with -val1.
+; We would then need to negate the result at the end, but in order to save this,
+; we just reverse the subtraction of the two table lookups, i.e.
+;     f(|val1-val2|) - f(val1+val2)
+; However, as we just said, we use -val1, so what we now get is:
+;     f(|-(val1+val2)|) - f(val2-val1)
+;   = f(|val1+val2|) - f(val2-val1)
+
+    ; On entry, A contains val1, C is clear
+mul_neg:
+        adc mulval2                            ; val1+val2 (in range -127..127)
+        bcs +                        ; see if val1+val2 was negative
+        eor #255                               ; if so negate it to yield a positive value
+        adc #1
+        sec                                    ; set C flag in anticipation
+*
+        tax                                    ; X = |val1+val2| (in range 0..127)
+
+        lda mulval2                            ; C guaranteed to be set here
+        sbc mulval1
+        tay                                    ; Y = val2-val1 (in range 0..254)
+
+        sec
+        lda MultTableHigh,X
+        sbc MultTableHigh,Y
+        rts
+
+
+spr_3d_plot:
+        stx SPR_ANGLE
+        sty SPR_DIST
+        
+        pha
+        lsr
+        lsr
+        lsr
+        lsr
+        sta SPR_PALETTE
+        pla
+        and #$f
+        
+        jsr spr_get
+        
+        pha   ;frame
+        
+        ldy SPR_ANGLE
+        ldx xang,y
+        ldy SPR_DIST
+        lda disttable,y
+        tay
+        jsr mul
+        clc
+        adc #64
+        pha   ;X
+        
+        ldy SPR_ANGLE
+        ldx yang,y
+        ldy SPR_DIST
+        lda disttable,y
+        tay
+        jsr mul
+        clc
+        adc #128
+        tay
+        
+        pla
+        tax
+        pla 
+        
+        jmp spr_draw
+
+        
+irqrt:  lda $fe4d
+        sta $fe4d
+        inc VSFLAG
+        inc VSFLAG2
+        inc FRAME_CNT
+                
+        lda $fc
+        rti
+
+;A = sprite class
+;X = rotation
+;Y = distance
+;SPR_FRAME = frame
+;Return : A = sprite number, SPR_FLAGS = render flags 
+spr_get:
+        .byte PHY
+        .byte PHX
+        asl
+        asl
+        asl
+        adc #<sprite_classes
+        sta t
+        lda #0
+        adc #>sprite_classes
+        sta t+1
+        
+;        .byte PHY
+        ldy #1
+        lda SPR_FRAME
+        and (t),y
+        sta t+2
+        
+        txa
+        clc
+        adc #2
+        lsr
+        lsr
+        tax
+        lda ang_to_sprite,x
+        and #$c0
+        sta SPR_FLAGS
+        lda ang_to_sprite,x
+        and #$3f
+        
+        pha
+        ldy #2
+        lda (t),y  ;A = rotation shift
+        tax
+        pla
+        
+*       cpx #0
+        bmi spr_get_shift_minus
+        beq +
+        asl
+        dex
+        bne -
+        beq +
+
+
+spr_get_shift_minus:
+        lsr
+        inx
+        bne spr_get_shift_minus 
+        
+*       iny
+        and (t),y   ;A &= rotation mask
+        ora t+2
+        sta t+2    ;t+2 = FRAME | ROTATION
+        
+        clc
+        .byte ADC_INDZP, t    ;A = (FRAME | ROTATION) + BASE
+
+        pha        
+        iny
+        lda (t),y
+        sta spr_get_mod1+1
+        asl
+        sta spr_get_mod2+1
+        clc
+        adc (t),y
+        sta spr_get_mod3+1
+        pla
+                        
+        .byte PLX
+        .byte PLY
+
+;transition to 0.75x at distance 0xe5 (0x4f)
+;transition to 0.5x at distance 0xbc (0x38)                        
+;transition to 0.33x at distance 0x30 (0x21)
+        
+        pha
+spr_get_mod3: lda #$6c
+        cpy #$30
+        bcc +
+spr_get_mod2: lda #$48
+        cpy #$bc
+        bcc +
+spr_get_mod1: lda #$24
+        cpy #$e5
+        bcc +
+        lda #0
+*       sta t+2
+        pla
+        clc
+        adc t+2
+        
+        rts
+
+
+sprite_flags: .byte $00, $40, $80, $c0
+ 
+; base
+; frame mask
+; rotation shift
+; rotation mask
+; distance rshift
+; distance lshift
+; distance max 
+
+sprite_classes:
+        .byte $11, 3, 1,   $3c, $24, 0, 0, 0
+        .byte 161, 0, $ff, $0f, 9, 0, 0, 0
+        
+
+;fa-6 - 0-c                        7
+;ship_sprites: .byte 1,1,1,2,2,2,3, 3, 3,$02,$02,$02,$01,$01
+;ship_flags:   .byte 0,0,0,0,0,0,0, 0, 0,$80,$80,$80,$80,$80
+
+
+;shipa_sprites: .byte 1,1,1,2,2,2,3, 3, 3,$02,$02,$02,$01,$01
+;shipa_flags:   .byte 0,0,0,0,0,0,0, 0, 0,$80,$80,$80,$80,$80
+;
+;
+;
+ship_sprites:
+.byte $10,$0f,$0f,$0e,$0e,$0d,$0d,$0c
+.byte $0c,$0b,$0b,$0a,$0a,$09,$09,$08
+.byte $08,$07,$07,$06,$06,$05,$05,$04
+.byte $04,$03,$03,$02,$02,$01,$01,$00
+.byte $00,$01,$01,$02,$02,$03,$03,$04
+.byte $04,$05,$05,$06,$06,$07,$07,$08
+.byte $08,$09,$09,$0a,$0a,$0b,$0b,$0c
+.byte $0c,$0d,$0d,$0e,$0e,$0f,$0f,$10
+
+;.byte $00,$01,$01,$02,$02,$03,$03,$04
+;.byte $04,$05,$05,$06,$06,$07,$07,$08
+;.byte $08,$07,$07,$06,$06,$05,$05,$04
+;.byte $04,$03,$03,$02,$02,$01,$01,$00
+
+ydiff:
+        .byte $00,$02,$04,$08,$0b,$0f,$11,$16
+        .byte $18,$1a,$1e,$20,$25,$27,$2b,$2d
+        .byte $2f,$33,$35,$39,$3b,$3f,$41,$43
+        .byte $47,$48,$4c,$4e,$51,$53,$54,$58
+        .byte $59,$5c,$5e,$61,$62,$64,$66,$68
+        .byte $6a,$6b,$6d,$6f,$70,$72,$73,$74
+        .byte $75,$77,$78,$78,$7a,$7a,$7b,$7c
+        .byte $7d,$7d,$7d,$7e,$7e,$7e,$7e,$7f
+        .byte $7f,$7e,$7e,$7e,$7e,$7e,$7d,$7d
+        .byte $7c,$7c,$7b,$7a,$79,$78,$77,$76
+        .byte $75,$74,$73,$71,$70,$6d,$6c,$6b
+        .byte $69,$68,$65,$64,$61,$5f,$5e,$5b
+        .byte $59,$56,$54,$51,$4f,$4e,$4a,$48
+        .byte $45,$43,$3f,$3d,$3b,$37,$35,$31
+        .byte $2f,$2b,$29,$27,$23,$20,$1c,$1a
+        .byte $16,$13,$11,$0d,$0b,$06,$04,$00
+
+xdiff:
+        .byte $80,$81,$81,$81,$81,$81,$82,$82
+        .byte $83,$83,$84,$85,$86,$87,$88,$89
+        .byte $8a,$8b,$8c,$8e,$8f,$92,$93,$94
+        .byte $96,$97,$9a,$9b,$9e,$a0,$a1,$a4
+        .byte $a6,$a9,$ab,$ae,$b0,$b1,$b5,$b7
+        .byte $ba,$bc,$c0,$c2,$c4,$c8,$ca,$ce
+        .byte $d0,$d4,$d6,$d8,$dc,$df,$e3,$e5
+        .byte $e9,$ec,$ee,$f2,$f4,$f9,$fb,$ff
+        .byte $00,$02,$04,$08,$0b,$0f,$11,$16
+        .byte $18,$1a,$1e,$20,$25,$27,$2b,$2d
+        .byte $2f,$33,$35,$39,$3b,$3f,$41,$43
+        .byte $47,$48,$4c,$4e,$51,$53,$54,$58
+        .byte $59,$5c,$5e,$61,$62,$64,$66,$68
+        .byte $6a,$6b,$6d,$6f,$70,$72,$73,$74
+        .byte $75,$77,$78,$78,$7a,$7a,$7b,$7c
+        .byte $7d,$7d,$7d,$7e,$7e,$7e,$7e,$7f
+
+;ydiff:
+;        .byte $00,$04,$0b,$11,$18,$1e,$25,$2b
+;        .byte $31,$37,$3d,$41,$47,$4c,$51,$56
+;        .byte $5b,$5f,$64,$68,$6b,$6d,$71,$74
+;        .byte $76,$78,$7a,$7c,$7d,$7e,$7e,$7f
+;        .byte $7f,$7e,$7e,$7d,$7c,$7b,$79,$77
+;        .byte $74,$72,$6f,$6c,$69,$65,$61,$5c
+;        .byte $58,$53,$4e,$48,$43,$3f,$39,$33
+;        .byte $2d,$27,$20,$1a,$13,$0d,$06,$00
+;
+;xdiff:
+;        .byte $80,$81,$81,$82,$83,$84,$86,$88
+;        .byte $8b,$8d,$90,$93,$96,$9a,$9e,$a3
+;        .byte $a7,$ac,$b1,$b7,$bc,$c0,$c6,$cc
+;        .byte $d2,$d8,$df,$e5,$ec,$f2,$f9,$ff
+;        .byte $00,$04,$0b,$11,$18,$1e,$25,$2b
+;        .byte $31,$37,$3d,$41,$47,$4c,$51,$56
+;        .byte $5b,$5f,$64,$68,$6b,$6d,$71,$74
+;        .byte $76,$78,$7a,$7c,$7d,$7e,$7e,$7f
+
+
+;ydiff:
+;        .byte $00,$0d,$1a,$27,$33,$3f,$4a,$54
+;        .byte $5e,$66,$6d,$74,$78,$7c,$7e,$7f
+;        .byte $7f,$7e,$7c,$78,$74,$6d,$66,$5e
+;        .byte $54,$4a,$3f,$33,$27,$1a,$0d,$00
+;
+;xdiff:
+;        .byte $80,$81,$83,$87,$8b,$92,$99,$a1
+;        .byte $ab,$b5,$c0,$cc,$d8,$e5,$f2,$ff
+;        .byte $00,$0d,$1a,$27,$33,$3f,$4a,$54
+;        .byte $5e,$66,$6d,$74,$78,$7c,$7e,$7f
+
+
+
+
+;ydiffl:
+;        .byte $00,$01,$03,$04,$06,$07,$08,$0a
+;        .byte $0b,$0c,$0c,$0d,$0e,$0e,$0e,$0f
+;        .byte $0f,$0e,$0e,$0e,$0d,$0c,$0c,$0b
+;        .byte $0a,$08,$07,$06,$04,$03,$01,$00
+;xdiffl:
+;        .byte $00,$1a,$35,$4e,$67,$7f,$95,$aa
+;        .byte $bd,$ce,$dc,$e8,$f2,$f9,$fd,$ff
+;        .byte $00,$02,$06,$0d,$17,$23,$31,$42
+;        .byte $55,$6a,$80,$98,$b1,$ca,$e5,$ff
+;xdiffh:
+;        .byte $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff
+;        .byte $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff
+;        .byte $00,$00,$00,$00,$00,$00,$00,$00
+;        .byte $00,$00,$00,$00,$00,$00,$00,$00
+                
+ang_to_sprite: 
+        .byte $40,$41,$42,$43,$44,$45,$46,$47,$48,$49,$4a,$4b,$4c,$4d,$4e,$4f
+        .byte $10,$0f,$0e,$0d,$0c,$0b,$0a,$09,$08,$07,$06,$05,$04,$03,$02,$01
+        .byte $00,$81,$82,$83,$84,$85,$86,$87,$88,$89,$8a,$8b,$8c,$8d,$8e,$8f
+        .byte $90,$cf,$ce,$cd,$cc,$cb,$ca,$c9,$c8,$c7,$c6,$c5,$c4,$c3,$c2,$c1
+
+objects_draw:
+;rts
+        lda #<objects
+        sta t+14
+        lda #>objects
+        sta t+15
+        
+object_draw_loop:
+        lda WBANK
+        and #$fb
+        sta $fe34 ;Enable main memory at $3000-$8000
+
+        .byte LDA_INDZP, t+14
+        cmp #$ff
+        bne +
+        
+        lda WBANK
+        sta $fe34 ;Restore mapping at $3000-$8000
+
+        rts
+
+*       sta object_draw_type_mod+1
+
+        inc t+14
+        .byte LDA_INDZP, t+14
+        eor #$80
+        clc
+        adc XOFF
+        tax
+
+        inc t+14
+        .byte LDA_INDZP, t+14
+        inc t+14
+        sec
+        sbc YOFF
+        tay
+        .byte LDA_INDZP, t+14
+        sbc YOFFH
+        sta t+13
+
+        tya
+        sec
+        sbc #$10
+        sta t+12
+        lda t+13
+        sbc #0
+        and #15
+        bne object_dont_plot        
+
+        lda #0
+        sec
+        sbc t+12
+        tay
+
+        lda WBANK
+        sta $fe34 ;Restore mapping at $3000-$8000
+
+object_draw_type_mod: lda #0
+        jsr spr_3d_plot        
+
+object_dont_plot:
+        lda WBANK
+        sta $fe34 ;Restore mapping at $3000-$8000
+
+        inc t+14
+        bne object_draw_loop
+        inc t+15
+        bne object_draw_loop
+
+.checkpc $2a00
+.advance $2a00
+objects:
+        ;     Type  X    Y    Y high
+        .byte $01,    $40, $20, $00
+        .byte $11,    $60, $20, $00
+        .byte $21,    $a0, $20, $00
+;        .byte 0,    $28, $00, $01
+;        .byte 0,    $d8, $00, $01
+;        .byte 0,    $50, $00, $01
+;        .byte 0,    $b0, $00, $01
+;        .byte 0,    $48, $98, $01
+        .byte $ff
+
+.checkpc $2b00
+.advance $2b00
+
+;.include "plothi"
+        
+;  .checkpc $3000       
+;  .advance $3000
+.checkpc $3c00       
+.advance $3c00
+tiles:
+;.incbin "lev1"
+
+;        .byte $00,$00,$00,$00
+;        .byte $00,$00,$00,$00
+;        .byte $00,$00,$00,$00
+;        .byte $00,$00,$00,$00
+;        
+;        .byte $03,$03,$03,$03
+;        .byte $03,$03,$03,$03
+;        .byte $03,$03,$03,$03
+;        .byte $03,$03,$03,$03
+;        
+;        .byte $07,$07,$07,$07
+;        .byte $07,$07,$07,$07
+;        .byte $07,$07,$07,$07
+;        .byte $07,$07,$07,$07
+;                
+;        .byte $00,$00,$00,$0f
+;        .byte $00,$00,$0f,$07
+;        .byte $00,$0f,$07,$07
+;        .byte $0f,$07,$07,$07
+;
+;        .byte $0f,$00,$00,$00
+;        .byte $07,$0f,$00,$00
+;        .byte $07,$07,$0f,$00
+;        .byte $07,$07,$07,$0f
+;
+;        .byte $0f,$07,$07,$07
+;        .byte $00,$0f,$07,$07
+;        .byte $00,$00,$0f,$07
+;        .byte $00,$00,$00,$0f
+;
+;        .byte $07,$07,$07,$0f
+;        .byte $07,$07,$0f,$00
+;        .byte $07,$0f,$00,$00
+;        .byte $0f,$00,$00,$00
+;
+;        .byte $0f,$0f,$0f,$0f
+;        .byte $0f,$03,$03,$0f
+;        .byte $0f,$03,$03,$0f
+;        .byte $0f,$0f,$0f,$0f
+;
+;        .byte $0f,$07,$07,$07
+;        .byte $0f,$07,$07,$07
+;        .byte $0f,$07,$07,$07
+;        .byte $0f,$07,$07,$07
+;
+;        .byte $07,$07,$07,$0f
+;        .byte $07,$07,$07,$0f
+;        .byte $07,$07,$07,$0f
+;        .byte $07,$07,$07,$0f
+;
+;.checkpc $3400       
+;.advance $3400                
+;map:
+;        .byte "AAAAAAAAAAAAAAAA"
+;        .byte "ABBBBBBBBBBBBBBA"
+;        .byte "ABBBCCCCCCCCBBBA"
+;        .byte "ABBBCCCCCCCCBBBA"        
+;        .byte "ABBBCCCCCCCCBBBA"
+;        .byte "ABBBCCCCCCCCBBBA"
+;        .byte "ABBBBBBBBBBBBBBA"
+;        .byte "AAAAAAAAAAAAAAAA"        
+;        .byte "AAAAAABBBBAAAAAA"
+;        .byte "AAHAAABBBBAAAHAA"
+;        .byte "AAAAAABBBBAAAAAA"
+;        .byte "AAAAAABBBBAAAAAA"        
+;        .byte "AAAAAAICCJAAAAAA"
+;        .byte "AAAAAAICCJAAAAAA"
+;        .byte "AAAAAAICCJAAAAAA"
+;        .byte "AAAAAAICCJAAAAAA"        
+;        .byte "AAAAADCCCCEAAAAA"
+;        .byte "AAAADCCCCCCEAAAA"
+;        .byte "AAADCCCGFCCCEAAA"
+;        .byte "AADCCCGAAFCCCEAA"        
+;        .byte "ADCCCGAAAAFCCCEA"
+;        .byte "DCCCGAAAAAAFCCCE"
+;        .byte "CCCJAAAAAAAAICCC"
+;        .byte "CCCJAAAAAAAAICCC"
+;        .byte "CCCJAAAAAAAAICCC"
+;        .byte "FCCCEAAAAAADCCCG"        
+;        .byte "AFCCCEAAAADCCCGA"
+;        .byte "AAICCCEAADCCCJAA"
+;        .byte "AAICCCJAAICCCJAA"
+;        .byte "AAICCCJAAICCCJAA"        
+;        .byte "AAICCCJAAICCCJAA"
+;        .byte "AAICCCJAAICCCJAA"
+       
+        
+;ldstr: .byte "LOAD DAT 2000",13
+
+;.checkpc $4700
+;.advance $4700
+
+
+
+
+.advance $4800
+.include "TABLES"
+
+.checkpc $6000
+        
+.advance $6000
+        .incbin "dat"
+;data:   .incbin "dat" 

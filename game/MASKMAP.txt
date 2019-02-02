@@ -1,0 +1,725 @@
+;Zero out the bit at the middle of the screen, and mask the edges to create a fog-type
+;effect (or as close as you can get in MODE 2)
+
+zero27:
+        stx x_1
+        lda #248
+        sec
+        sbc x_1
+        sta x_2
+        lda #0
+        jmp dzero27
+zero28:
+        stx x_1
+        lda #248
+        sec
+        sbc x_1
+        sta x_2
+        lda #0
+        jmp dzero28
+zero30:
+        stx x_1
+        lda #248
+        sec
+        sbc x_1
+        sta x_2
+        lda #0
+        jmp dzero30
+
+dzero27:
+*       ldx x_1
+        ldy $5a04,x
+        beq + 
+        sta $5a04,x
+        sta $5a05,x        
+        sta $5a06,x
+        sta $5a07,x        
+*       ldy $6400,x
+        beq + 
+        sta $6400,x
+        sta $6401,x        
+        sta $6402,x
+        sta $6403,x
+*       ldx x_2
+        ldy $5b04,x
+        beq + 
+        sta $5b04,x
+        sta $5b05,x        
+        sta $5b06,x
+        sta $5b07,x        
+*       ldy $6500,x
+        beq + 
+        sta $6500,x
+        sta $6501,x        
+        sta $6502,x
+        sta $6503,x        
+
+dzero28:
+*       ldx x_1
+        ldy $5c00,x
+        beq + 
+        sta $5c00,x
+        sta $5c01,x        
+        sta $5c02,x
+        sta $5c03,x                
+*       ldy $6204,x
+        beq + 
+        sta $6204,x
+        sta $6205,x        
+        sta $6206,x
+        sta $6207,x
+*       ldx x_2
+        ldy $5d00,x
+        beq + 
+        sta $5d00,x
+        sta $5d01,x        
+        sta $5d02,x
+        sta $5d03,x        
+*       ldy $6304,x
+        beq + 
+        sta $6304,x
+        sta $6305,x        
+        sta $6306,x
+        sta $6307,x        
+
+*       ldx x_1
+        ldy $5c04,x
+        beq + 
+        sta $5c04,x
+        sta $5c05,x        
+        sta $5c06,x
+        sta $5c07,x        
+*       ldy $6200,x
+        beq + 
+        sta $6200,x
+        sta $6201,x        
+        sta $6202,x
+        sta $6203,x
+*       ldx x_2
+        ldy $5d04,x
+        beq + 
+        sta $5d04,x
+        sta $5d05,x        
+        sta $5d06,x
+        sta $5d07,x        
+*       ldy $6300,x
+        beq + 
+        sta $6300,x
+        sta $6301,x        
+        sta $6302,x
+        sta $6303,x        
+
+
+
+dzero30:
+*       ldx x_1
+        ldy $5e00,x
+        beq + 
+        sta $5e00,x
+        sta $5e01,x        
+        sta $5e02,x
+        sta $5e03,x        
+*       ldy $6004,x
+        beq + 
+        sta $6004,x
+        sta $6005,x        
+        sta $6006,x
+        sta $6007,x
+*       ldx x_2
+        ldy $5f00,x
+        beq + 
+        sta $5f00,x
+        sta $5f01,x        
+        sta $5f02,x
+        sta $5f03,x        
+*       ldy $6104,x
+        beq + 
+        sta $6104,x
+        sta $6105,x        
+        sta $6106,x
+        sta $6107,x        
+
+*       ldx x_1
+        ldy $5e04,x
+        beq + 
+        sta $5e04,x
+        sta $5e05,x        
+        sta $5e06,x
+        sta $5e07,x        
+*       ldy $6000,x
+        beq + 
+        sta $6000,x
+        sta $6001,x        
+        sta $6002,x
+        sta $6003,x
+*       ldx x_2
+        ldy $5f04,x
+        beq + 
+        sta $5f04,x
+        sta $5f05,x        
+        sta $5f06,x
+        sta $5f07,x        
+*       ldy $6100,x
+        beq + 
+        sta $6100,x
+        sta $6101,x        
+        sta $6102,x
+        sta $6103,x        
+
+
+*       rts
+
+
+;        ldx #216
+;        jsr zero30
+;        ldx #224
+;        jsr zero28
+;        ldx #232
+;        jsr zero28
+;        ldx #240
+;        jsr zero27
+;        ldx #248
+;        jsr zero27
+
+dofog:  ldx #6
+*       lda $5cd0,x
+        and #$55
+        ora #$80
+        sta $5cd0,x
+        lda $5cd1,x
+        and #$aa
+        sta $5cd1,x
+        lda $62d0,x
+        and #$55
+        ora #$80
+        sta $62d0,x
+        lda $62d1,x
+        and #$aa
+        sta $62d1,x
+        
+        lda $5d28,x
+        and #$55
+        ora #$80
+        sta $5d28,x
+        lda $5d29,x
+        and #$aa
+        sta $5d29,x
+        lda $6328,x
+        and #$55
+        ora #$80
+        sta $6328,x
+        lda $6329,x
+        and #$aa
+        sta $6329,x
+        
+        lda $5ec8,x
+        and #$55
+        ora #$80
+        sta $5ec8,x
+        lda $5ec9,x
+        and #$aa
+        sta $5ec9,x
+        lda $60c8,x
+        and #$55
+        ora #$80
+        sta $60c8,x
+        lda $60c9,x
+        and #$aa
+        sta $60c9,x
+        lda $5f30,x
+        and #$55
+        ora #$80
+        sta $5f30,x
+        lda $5f31,x
+        and #$aa
+        sta $5f31,x
+        lda $6130,x
+        and #$55
+        ora #$80
+        sta $6130,x
+        lda $6131,x
+        and #$aa
+        sta $6131,x
+        dex
+        dex
+        bmi +
+        jmp -
+*
+
+        ldx #4
+*       lda $5ed0,x
+        and #$55
+        ora #$80
+        sta $5ed0,x
+        .byte STZ_ABS_X
+        .word $5ed1
+        lda $5ed2,x
+        and #$aa
+        sta $5ed2,x
+        .byte STZ_ABS_X
+        .word $5ed3
+
+        lda $60d0,x
+        and #$55
+        ora #$80
+        sta $60d0,x
+        .byte STZ_ABS_X
+        .word $60d1
+        lda $60d2,x
+        and #$aa
+        sta $60d2,x
+        .byte STZ_ABS_X
+        .word $60d3        
+
+        lda $5f28,x
+        and #$55
+        ora #$80
+        sta $5f28,x
+        .byte STZ_ABS_X
+        .word $5f29
+        lda $5f2a,x
+        and #$aa
+        sta $5f2a,x
+        .byte STZ_ABS_X
+        .word $5f2b
+
+        lda $6128,x
+        and #$55
+        ora #$80
+        sta $6128,x
+        .byte STZ_ABS_X
+        .word $6129
+        lda $612a,x
+        and #$aa
+        sta $612a,x
+        .byte STZ_ABS_X
+        .word $612b
+                        
+        dex
+        dex
+        dex
+        dex
+        bpl -
+
+        lda $5cd8
+        and #$55
+        ora #$80
+        sta $5cd8
+        .byte STZ_ABS
+        .word $5cd9
+        lda $5cda
+        and #$aa
+        sta $5cda
+        .byte STZ_ABS
+        .word $5cdb
+        lda $5cdc
+        and #$55
+        ora #$80
+        sta $5cdc
+        .byte STZ_ABS
+        .word $5cdd
+        lda $5cde
+        and #$aa
+        sta $5cde
+        .byte STZ_ABS
+        .word $5cdf
+
+        lda $5d20
+        and #$55
+        ora #$80
+        sta $5d20
+        .byte STZ_ABS
+        .word $5d21
+        lda $5d22
+        and #$aa
+        sta $5d22
+        .byte STZ_ABS
+        .word $5d23
+        lda $5d24
+        and #$55
+        ora #$80
+        sta $5d24
+        .byte STZ_ABS
+        .word $5d25
+        lda $5d26
+        and #$aa
+        sta $5d26
+        .byte STZ_ABS
+        .word $5d27
+
+        lda $62d8
+        and #$55
+        ora #$80
+        sta $62d8
+        .byte STZ_ABS
+        .word $62d9
+        lda $62da
+        and #$aa
+        sta $62da
+        .byte STZ_ABS
+        .word $62db
+        lda $62dc
+        and #$55
+        ora #$80
+        sta $62dc
+        .byte STZ_ABS
+        .word $62dd
+        lda $62de
+        and #$aa
+        sta $62de
+        .byte STZ_ABS
+        .word $62df
+
+        lda $6320
+        and #$55
+        ora #$80
+        sta $6320
+        .byte STZ_ABS
+        .word $6321
+        lda $6322
+        and #$aa
+        sta $6322
+        .byte STZ_ABS
+        .word $6323
+        lda $6324
+        and #$55
+        ora #$80
+        sta $6324
+        .byte STZ_ABS
+        .word $6325
+        lda $6326
+        and #$aa
+        sta $6326
+        .byte STZ_ABS
+        .word $6327
+
+
+        lda $5adc
+        and #$55
+        ora #$80
+        sta $5adc
+        lda $5add
+        and #$aa
+        sta $5add
+        lda $5ade
+        and #$55
+        sta $5ade
+        lda $5adf
+        and #$aa
+        sta $5adf
+
+        lda $5b24
+        and #$55
+        ora #$80
+        sta $5b24
+        lda $5b25
+        and #$aa
+        sta $5b25
+        lda $5b26
+        and #$55
+        sta $5b26
+        lda $5b27
+        and #$aa
+        sta $5b27
+
+
+        lda $64d8
+        and #$55
+        ora #$80
+        sta $64d8
+        lda $64d9
+        and #$aa
+        sta $64d9
+        lda $64da
+        and #$55
+        sta $64da
+        lda $64db
+        and #$aa
+        sta $64db
+
+        lda $6520
+        and #$55
+        ora #$80
+        sta $6520
+        lda $6521
+        and #$aa
+        sta $6521
+        lda $6522
+        and #$55
+        sta $6522
+        lda $6523
+        and #$aa
+        sta $6523
+
+        ldx #8
+
+*       lda $5ae4,x
+        and #$55
+        ora #$80
+        sta $5ae4,x
+        .byte STZ_ABS_X
+        .word $5ae5
+        lda $5ae6,x
+        and #$aa
+        sta $5ae6,x
+        .byte STZ_ABS_X
+        .word $5ae7
+
+        lda $5b14,x
+        and #$55
+        ora #$80
+        sta $5b14,x
+        .byte STZ_ABS_X
+        .word $5b15
+        lda $5b16,x
+        and #$aa
+        sta $5b16,x
+        .byte STZ_ABS_X
+        .word $5b17
+
+        lda $64e0,x
+        and #$55
+        ora #$80
+        sta $64e0,x
+        .byte STZ_ABS_X
+        .word $64e1
+        lda $64e2,x
+        and #$aa
+        sta $64e2,x
+        .byte STZ_ABS_X
+        .word $64e3
+
+        lda $6510,x
+        and #$55
+        ora #$80
+        sta $6510,x
+        .byte STZ_ABS_X
+        .word $6511
+        lda $6512,x
+        and #$aa
+        sta $6512,x
+        .byte STZ_ABS_X
+        .word $6513
+
+        txa
+        eor #8
+        tax
+        beq -
+
+
+
+        ldx #2        
+*       lda $58f4,x
+        and #$55
+        ora #$80
+        sta $58f4,x
+        lda $58f5,x
+        and #$aa
+        sta $58f5,x
+        lda $58fc,x
+        and #$55
+        ora #$80
+        sta $58fc,x
+        lda $58fd,x
+        and #$aa
+        sta $58fd,x
+        lda $5904,x
+        and #$55
+        ora #$80
+        sta $5904,x
+        lda $5905,x
+        and #$aa
+        sta $5905,x
+        lda $590c,x
+        and #$55
+        ora #$80
+        sta $590c,x
+        lda $590d,x
+        and #$aa
+        sta $590d,x
+        
+        lda $66f0,x
+        and #$55
+        ora #$80
+        sta $66f0,x
+        lda $66f1,x
+        and #$aa
+        sta $66f1,x
+        lda $66f8,x
+        and #$55
+        ora #$80
+        sta $66f8,x
+        lda $66f9,x
+        and #$aa
+        sta $66f9,x
+        lda $6700,x
+        and #$55
+        ora #$80
+        sta $6700,x
+        lda $6701,x
+        and #$aa
+        sta $6701,x
+        lda $6708,x
+        and #$55
+        ora #$80
+        sta $6708,x
+        lda $6709,x
+        and #$aa
+        sta $6709,x
+        
+        
+        lda $5ae0,x
+        and #$55 
+        ora #$80
+        sta $5ae0,x
+        lda $5ae1,x
+        and #$aa
+        sta $5ae1,x
+        lda $5ae8,x
+        and #$55
+        ora #$80
+        sta $5ae8,x
+        lda $5ae9,x
+        and #$aa
+        sta $5ae9,x
+        lda $5b10,x
+        and #$55 
+        ora #$80
+        sta $5b10,x
+        lda $5b11,x
+        and #$aa
+        sta $5b11,x
+        lda $5b18,x
+        and #$55
+        ora #$80
+        sta $5b18,x
+        lda $5b19,x
+        and #$aa
+        sta $5b19,x
+
+        lda $64e4,x
+        and #$55
+        ora #$80
+        sta $64e4,x
+        lda $64e5,x
+        and #$aa
+        sta $64e5,x
+        lda $64ec,x
+        and #$55
+        ora #$80
+        sta $64ec,x
+        lda $64ed,x
+        and #$aa
+        sta $64ed,x
+        lda $6514,x
+        and #$55
+        ora #$80
+        sta $6514,x
+        lda $6515,x
+        and #$aa
+        sta $6515,x
+        lda $651c,x
+        and #$55
+        ora #$80
+        sta $651c,x
+        lda $651d,x
+        and #$aa
+        sta $651d,x
+        
+        dex
+        dex
+        bmi +
+        jmp -
+
+*       lda $5af0
+        and #$55
+        ora #$80
+        sta $5af0
+        .byte STZ_ABS
+        .word $5af1
+        lda $5af2
+        and #$aa
+        sta $5af2
+        .byte STZ_ABS
+        .word $5af3
+        lda $5af8
+        and #$55
+        ora #$80
+        sta $5af8
+        .byte STZ_ABS
+        .word $5af9
+        lda $5afa
+        and #$aa
+        sta $5afa
+        .byte STZ_ABS
+        .word $5afb
+        lda $5b00
+        and #$55
+        ora #$80
+        sta $5b00
+        .byte STZ_ABS
+        .word $5b01
+        lda $5b02
+        and #$aa
+        sta $5b02
+        .byte STZ_ABS
+        .word $5b03
+        lda $5b08
+        and #$55
+        ora #$80
+        sta $5b08
+        .byte STZ_ABS
+        .word $5b09
+        lda $5b0a
+        and #$aa
+        sta $5b0a
+        .byte STZ_ABS
+        .word $5b0b
+
+
+        lda $64f4
+        and #$55
+        ora #$80
+        sta $64f4
+        .byte STZ_ABS
+        .word $64f5
+        lda $64f6
+        and #$aa
+        sta $64f6
+        .byte STZ_ABS
+        .word $64f7
+        lda $64fc
+        and #$55
+        ora #$80
+        sta $64fc
+        .byte STZ_ABS
+        .word $64fd
+        lda $64fe
+        and #$aa
+        sta $64fe
+        .byte STZ_ABS
+        .word $64ff
+        lda $6504
+        and #$55
+        ora #$80
+        sta $6504
+        .byte STZ_ABS
+        .word $6505
+        lda $6506
+        and #$aa
+        sta $6506
+        .byte STZ_ABS
+        .word $6507
+        lda $650c
+        and #$55
+        ora #$80
+        sta $650c
+        .byte STZ_ABS
+        .word $650d
+        lda $650e
+        and #$aa
+        sta $650e
+        .byte STZ_ABS
+        .word $650f
+        
+        rts

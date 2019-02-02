@@ -1,0 +1,1623 @@
+;Sprite plotting routings. Sprites can be flipped horizontally and/or vertically
+;Lots of unrolled + self modifying code here
+
+ortables_exp1: .byte >ortable_exp1, >ortable1_exp1, >ortable2_exp1
+ortables_exp2: .byte >ortable_exp2, >ortable1_exp2, >ortable2_exp2
+flip_ortables_exp1: .byte >flip_ortable_exp1, >flip_ortable1_exp1, >flip_ortable2_exp1
+flip_ortables_exp2: .byte >flip_ortable_exp2, >flip_ortable1_exp2, >flip_ortable2_exp2
+
+dohang:
+        jmp dohang
+
+spr_draw:
+        sta SPR_SPRITE
+        sta sprdat_addr
+        lda #0
+        asl sprdat_addr
+        rol
+        asl sprdat_addr
+        rol
+        asl sprdat_addr
+        rol
+        ora #$80
+        sta sprdat_addr+1
+        
+        stx SPR_X
+        sty SPR_Y
+        
+        lda #5
+        sta $f4
+        sta $fe30
+
+;        sta t
+
+        ldy #0        
+        lda (sprdat_addr),y
+        sta spraddr
+        iny
+        lda (sprdat_addr),y
+        sta spraddr+1
+        
+        iny
+        lda (sprdat_addr),y
+        beq dohang
+        sta SPR_W
+        iny
+        lda (sprdat_addr),y
+        sta SPR_H
+        
+        iny
+        bit SPR_FLAGS
+        bmi spr_x_flip
+        
+        lda SPR_X
+        sec
+        sbc (sprdat_addr),y
+;        sbc (sprdat_addr),y
+        tax
+        jmp +
+spr_x_flip:
+        lda SPR_X
+        clc
+        adc (sprdat_addr),y
+;        adc (sprdat_addr),y
+        tax
+*       
+       
+        iny
+        bit SPR_FLAGS
+        bvs spr_y_flip
+        
+        lda SPR_Y
+        sec
+        sbc (sprdat_addr),y
+        tay
+        jmp +
+spr_y_flip:
+        lda SPR_Y
+        clc
+        adc (sprdat_addr),y
+        tay
+;        lda SPR_H
+;        sec
+;        sbc (sprdat_addr),y
+;        sta t
+;        lda SPR_Y
+;        sec
+;        sbc t
+;        tay
+*
+
+        txa
+        and #$fe
+        asl
+        asl
+        sta scraddr
+        tya       
+        and #7
+        ora scraddr
+        sta scraddr
+        tya
+        lsr
+        lsr
+        and #$fe
+        ora #$40
+        sta scraddr+1
+        txa
+        asl
+        asl
+        bcc +
+        inc scraddr+1
+*        
+        lda SPR_FLAGS
+        asl
+        rol
+        rol
+        asl
+        and #6
+        tax
+
+        ldy #6
+        lda (sprdat_addr),y
+
+        sta $f4
+        sta $fe30
+        
+        .byte JMP_INDX
+        .word spr_routs
+
+spr_routs:
+        .word spr_plot
+        .word spr_flipy_plot
+        .word spr_flipx_plot
+        .word spr_flipxy_plot
+        
+;No X or Y flipping
+spr_plot:
+        ldx SPR_PALETTE
+        lda ortables_exp1,x
+        sta spr_plot_exp1_mod0+2
+        sta spr_plot_exp1_mod1+2
+        sta spr_plot_exp1_mod2+2
+        sta spr_plot_exp1_mod3+2
+        sta spr_plot_exp1_mod4+2
+        sta spr_plot_exp1_mod5+2
+        sta spr_plot_exp1_mod6+2
+        sta spr_plot_exp1_mod7+2
+        sta spr_plot_exp1_mod8+2
+        sta spr_plot_exp1_mod9+2
+        lda ortables_exp2,x
+        sta spr_plot_exp2_mod0+2
+        sta spr_plot_exp2_mod1+2
+        sta spr_plot_exp2_mod2+2
+        sta spr_plot_exp2_mod3+2
+        sta spr_plot_exp2_mod4+2
+        sta spr_plot_exp2_mod5+2
+        sta spr_plot_exp2_mod6+2
+        sta spr_plot_exp2_mod7+2
+        sta spr_plot_exp2_mod8+2
+        sta spr_plot_exp2_mod9+2
+
+        lda scraddr
+        pha
+        lda scraddr+1
+        pha
+        
+        lda SPR_W
+        cmp #9
+        bcs +
+       
+        .byte DEC_A
+        sta t
+        asl
+        sta t+1
+        lda t
+        clc
+        adc t+1
+        sta t ;A*3
+        
+        lda t+1        
+        asl
+        asl
+        asl
+        asl
+        sec
+        sbc t
+        tax
+        
+        lda #$4c; JMP
+        sta spr_mod_start,x
+        lda #<spr_plot_nextline
+        sta spr_mod_start+1,x        
+        lda #>spr_plot_nextline
+        sta spr_mod_start+2,x
+        
+        stx t+2        
+
+        lda SPR_W
+        .byte DEC_A
+        asl
+        asl
+        asl
+        asl
+        tax
+        lda #$60 ;RTS
+        sta sprfin_mod_start,x
+
+*       lda SPR_H
+        sta t
+        lda SPR_W
+        asl
+        asl
+        asl
+        sta t+1
+
+spr_plot_loopy:
+        .byte LDA_INDZP, spraddr
+        tax
+        .byte LDA_INDZP, scraddr
+        and masktable_exp1,x
+spr_plot_exp1_mod0:
+        ora ortable_exp1,x        
+        .byte STA_INDZP, scraddr 
+        ldy #8
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_exp2_mod0:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+spr_mod_start:
+        ldy #8
+        lda (spraddr),y
+        tax
+        ldy #16
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_exp1_mod1:
+        ora ortable_exp1,x        
+        sta (scraddr),y  ;2+5+2+5+4+4+6 = 28 cycles, 15 bytes 
+        ldy #24
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_exp2_mod1:
+        ora ortable_exp2,x        
+        sta (scraddr),y  ;2+5+2+2+5+4+4+6+2+5+4+4+6 = 51 cycles, 30 bytes   
+
+        ldy #16
+        lda (spraddr),y
+        tax
+        ldy #32
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_exp1_mod2:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #40
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_exp2_mod2:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #24
+        lda (spraddr),y
+        tax
+        ldy #48
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_exp1_mod3:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #56
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_exp2_mod3:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #32
+        lda (spraddr),y
+        tax
+        ldy #64
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_exp1_mod4:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #72
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_exp2_mod4:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #40
+        lda (spraddr),y
+        tax
+        ldy #80
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_exp1_mod5:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #88
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_exp2_mod5:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #48
+        lda (spraddr),y
+        tax
+        ldy #96
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_exp1_mod6:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #104
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_exp2_mod6:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #56
+        lda (spraddr),y
+        tax
+        ldy #112
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_exp1_mod7:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #120
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_exp2_mod7:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #64
+        lda (spraddr),y
+        tax
+        ldy #128
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_exp1_mod8:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #136
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_exp2_mod8:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #72
+        lda (spraddr),y
+        tax
+        ldy #144
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_exp1_mod9:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #152
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_exp2_mod9:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+spr_plot_nextline:
+        lda spraddr
+        .byte INC_A
+        .byte BIT_IMM, 7
+        bne +
+        
+        sec
+        sbc #8
+        clc
+        adc t+1
+        bcc +
+        
+        inc spraddr+1
+*       sta spraddr
+
+        lda scraddr
+        .byte INC_A
+        .byte BIT_IMM, 7
+        bne +
+        
+        sec
+        sbc #8
+        inc scraddr+1
+        inc scraddr+1
+        
+*       sta scraddr
+
+        dec t
+        beq +
+        jmp spr_plot_loopy
+        
+*       pla
+        sta scraddr+1
+        pla
+        .byte BIT_IMM, 3 ;If start address wasn't (addr & 3) = 0 then do dummy plot so that tube plotting will erase
+        beq +
+        
+        and #$fc
+        sta scraddr
+        jsr sprfin
+
+*       lda SPR_W
+        cmp #9
+        bcs +
+
+        ldx t+2
+        lda #$a0 ;LDY #
+        sta spr_mod_start,x
+        lda #$b1 ;LDA (),y
+        sta spr_mod_start+2,x
+        lda SPR_W
+        asl
+        asl
+        asl
+        sta spr_mod_start+1,x
+
+        lda SPR_W
+        .byte DEC_A
+        asl
+        asl
+        asl
+        asl
+        tax
+        lda #$a0 ;LDY #
+        sta sprfin_mod_start,x
+        
+*       lda #4
+        sta $f4
+        sta $fe30
+        rts
+
+sprfin:
+        .byte LDA_INDZP, scraddr
+        ora #$80
+        .byte STA_INDZP, scraddr 
+
+        ldy #8
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+sprfin_mod_start:
+        ldy #16
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #24
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #32
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #40
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #48
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #56
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #64
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #72
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #80
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #88
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #96
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #104
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #112
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #120
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #128
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #136
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #144
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #152
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        rts
+
+
+
+spr_flipx_plot:       
+        ldx SPR_PALETTE
+        lda flip_ortables_exp1,x
+        sta spr_plot_flipx_exp1_mod0+2
+        sta spr_plot_flipx_exp1_mod1+2
+        sta spr_plot_flipx_exp1_mod2+2
+        sta spr_plot_flipx_exp1_mod3+2
+        sta spr_plot_flipx_exp1_mod4+2
+        sta spr_plot_flipx_exp1_mod5+2
+        sta spr_plot_flipx_exp1_mod6+2
+        sta spr_plot_flipx_exp1_mod7+2
+        sta spr_plot_flipx_exp1_mod8+2
+        sta spr_plot_flipx_exp1_mod9+2
+        lda flip_ortables_exp2,x
+        sta spr_plot_flipx_exp2_mod0+2
+        sta spr_plot_flipx_exp2_mod1+2
+        sta spr_plot_flipx_exp2_mod2+2
+        sta spr_plot_flipx_exp2_mod3+2
+        sta spr_plot_flipx_exp2_mod4+2
+        sta spr_plot_flipx_exp2_mod5+2
+        sta spr_plot_flipx_exp2_mod6+2
+        sta spr_plot_flipx_exp2_mod7+2
+        sta spr_plot_flipx_exp2_mod8+2
+        sta spr_plot_flipx_exp2_mod9+2
+
+        lda SPR_W
+        .byte DEC_A
+        asl
+        asl
+        asl
+        sta t
+        
+        lda scraddr
+        sec
+        sbc #152
+        sta scraddr
+        lda scraddr+1
+        sbc #0
+        sta scraddr+1
+
+        lda scraddr
+        pha
+        lda scraddr+1
+        pha
+
+        .byte STZ_ZP, t+5
+                
+        lda SPR_W
+        cmp #9
+;        lda #0
+        bcs +
+
+        .byte DEC_A
+        sta t
+        asl
+        sta t+1
+        lda t
+        clc
+        adc t+1
+        sta t ;A*3
+        
+        lda t+1        
+        asl
+        asl
+        asl
+        asl
+        sec
+        sbc t
+        tax
+
+        lda #$4c; JMP
+        sta spr_flipx_mod_start,x
+        lda #<spr_flipx_plot_nextline
+        sta spr_flipx_mod_start+1,x        
+        lda #>spr_flipx_plot_nextline
+        sta spr_flipx_mod_start+2,x
+        
+        stx t+2        
+
+        lda SPR_W
+        .byte DEC_A
+        asl
+        asl
+        asl
+        asl
+        tax
+        lda #$60 ;RTS
+        sta sprfin_flipx_mod_start,x
+
+*       lda SPR_H
+        sta t
+        lda SPR_W
+        asl
+        asl
+        asl
+        sta t+1
+
+spr_flipx_plot_loopy:
+        .byte LDA_INDZP, spraddr
+        tax
+        ldy #152
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipx_exp2_mod0:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #144
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipx_exp1_mod0:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y 
+
+spr_flipx_mod_start:
+        ldy #8
+        lda (spraddr),y
+        tax
+        ldy #136
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipx_exp2_mod1:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y  ;2+5+2+5+4+4+6 = 28 cycles, 15 bytes 
+        ldy #128
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipx_exp1_mod1:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y  ;2+5+2+2+5+4+4+6+2+5+4+4+6 = 51 cycles, 30 bytes   
+
+        ldy #16
+        lda (spraddr),y
+        tax
+        ldy #120
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipx_exp2_mod2:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #112
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipx_exp1_mod2:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #24
+        lda (spraddr),y
+        tax
+        ldy #104
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipx_exp2_mod3:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #96
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipx_exp1_mod3:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #32
+        lda (spraddr),y
+        tax
+        ldy #88
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipx_exp2_mod4:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #80
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipx_exp1_mod4:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #40
+        lda (spraddr),y
+        tax
+        ldy #72
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipx_exp2_mod5:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #64
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipx_exp1_mod5:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #48
+        lda (spraddr),y
+        tax
+        ldy #56
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipx_exp2_mod6:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #48
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipx_exp1_mod6:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #56
+        lda (spraddr),y
+        tax
+        ldy #40
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipx_exp2_mod7:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #32
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipx_exp1_mod7:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #64
+        lda (spraddr),y
+        tax
+        ldy #24
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipx_exp2_mod8:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #16
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipx_exp1_mod8:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #72
+        lda (spraddr),y
+        tax
+        ldy #8
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipx_exp2_mod9:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #0
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipx_exp1_mod9:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y
+
+spr_flipx_plot_nextline:
+        lda spraddr
+        .byte INC_A
+        .byte BIT_IMM, 7
+        bne +
+        
+        sec
+        sbc #8
+        clc
+        adc t+1
+        bcc +
+        
+        inc spraddr+1
+*       sta spraddr
+
+        lda scraddr
+        .byte INC_A
+        .byte BIT_IMM, 7
+        bne +
+        
+        sec
+        sbc #8
+        inc scraddr+1
+        inc scraddr+1
+        
+*       sta scraddr
+
+        dec t
+        beq +
+        jmp spr_flipx_plot_loopy
+
+        
+*       pla
+        sta scraddr+1
+        pla
+        .byte BIT_IMM, 3 ;If start address wasn't (addr & 3) = 0 then do dummy plot so that tube plotting will erase
+        beq +
+        
+        and #$fc
+        sta scraddr
+        jsr sprfin_flipx
+
+*       lda SPR_W
+        cmp #9
+        bcs +
+
+        ldy #0
+        ldx t+2
+        lda #$a0 ;LDY #
+        sta spr_flipx_mod_start,x
+        lda SPR_W
+        asl
+        asl
+        asl
+        sta spr_flipx_mod_start+1,x
+        lda #$b1 ;LDA (),y
+        sta spr_flipx_mod_start+2,x
+        
+        lda SPR_W
+        .byte DEC_A
+        asl
+        asl
+        asl
+        asl
+        tax
+        lda #$a0 ;LDY #
+        sta sprfin_flipx_mod_start,x
+
+*       lda #4
+        sta $f4
+        sta $fe30
+        rts
+
+
+
+
+sprfin_flipx:
+        ldy #152
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y 
+
+        ldy #144
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+sprfin_flipx_mod_start:
+        ldy #136
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #128
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #120
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #112
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #104
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #96
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #88
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #80
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #72
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #64
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #56
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #48
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #40
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #32
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #24
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #16
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #8
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        ldy #0
+        lda (scraddr),y
+        ora #$80
+        sta (scraddr),y  ;2+5+2+6 = 15 cycles, 8 bytes 
+
+        rts
+
+
+
+        
+spr_flipy_plot:
+        ldx SPR_PALETTE
+        lda ortables_exp1,x
+        sta spr_plot_flipy_exp1_mod0+2
+        sta spr_plot_flipy_exp1_mod1+2
+        sta spr_plot_flipy_exp1_mod2+2
+        sta spr_plot_flipy_exp1_mod3+2
+        sta spr_plot_flipy_exp1_mod4+2
+        sta spr_plot_flipy_exp1_mod5+2
+        sta spr_plot_flipy_exp1_mod6+2
+        sta spr_plot_flipy_exp1_mod7+2
+        sta spr_plot_flipy_exp1_mod8+2
+        sta spr_plot_flipy_exp1_mod9+2
+        lda ortables_exp2,x
+        sta spr_plot_flipy_exp2_mod0+2
+        sta spr_plot_flipy_exp2_mod1+2
+        sta spr_plot_flipy_exp2_mod2+2
+        sta spr_plot_flipy_exp2_mod3+2
+        sta spr_plot_flipy_exp2_mod4+2
+        sta spr_plot_flipy_exp2_mod5+2
+        sta spr_plot_flipy_exp2_mod6+2
+        sta spr_plot_flipy_exp2_mod7+2
+        sta spr_plot_flipy_exp2_mod8+2
+        sta spr_plot_flipy_exp2_mod9+2
+
+        lda SPR_W
+        cmp #9
+        bcs +
+        
+        .byte DEC_A
+        sta t
+        asl
+        sta t+1
+        lda t
+        clc
+        adc t+1
+        sta t ;A*3
+        
+        lda t+1        
+        asl
+        asl
+        asl
+        asl
+        sec
+        sbc t
+        tax
+        
+        lda #$4c; JMP
+        sta spr_flipy_mod_start,x
+        lda #<spr_flipy_plot_nextline
+        sta spr_flipy_mod_start+1,x        
+        lda #>spr_flipy_plot_nextline
+        sta spr_flipy_mod_start+2,x
+        
+        stx t+2        
+
+        lda SPR_W
+        .byte DEC_A
+        asl
+        asl
+        asl
+        asl
+        tax
+        lda #$60 ;RTS
+        sta sprfin_mod_start,x
+
+*       lda SPR_H
+        sta t
+        lda SPR_W
+        asl
+        asl
+        asl
+        sta t+1
+
+spr_flipy_plot_loopy:
+        .byte LDA_INDZP, spraddr
+        tax
+        .byte LDA_INDZP, scraddr
+        and masktable_exp1,x
+spr_plot_flipy_exp1_mod0:
+        ora ortable_exp1,x        
+        .byte STA_INDZP, scraddr 
+        ldy #8
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_flipy_exp2_mod0:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+        
+spr_flipy_mod_start:
+        ldy #8
+        lda (spraddr),y
+        tax
+        ldy #16
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_flipy_exp1_mod1:
+        ora ortable_exp1,x        
+        sta (scraddr),y  ;2+5+2+5+4+4+6 = 28 cycles, 15 bytes 
+        ldy #24
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_flipy_exp2_mod1:
+        ora ortable_exp2,x        
+        sta (scraddr),y  ;2+5+2+2+5+4+4+6+2+5+4+4+6 = 51 cycles, 30 bytes   
+
+        ldy #16
+        lda (spraddr),y
+        tax
+        ldy #32
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_flipy_exp1_mod2:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #40
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_flipy_exp2_mod2:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #24
+        lda (spraddr),y
+        tax
+        ldy #48
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_flipy_exp1_mod3:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #56
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_flipy_exp2_mod3:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #32
+        lda (spraddr),y
+        tax
+        ldy #64
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_flipy_exp1_mod4:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #72
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_flipy_exp2_mod4:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #40
+        lda (spraddr),y
+        tax
+        ldy #80
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_flipy_exp1_mod5:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #88
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_flipy_exp2_mod5:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #48
+        lda (spraddr),y
+        tax
+        ldy #96
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_flipy_exp1_mod6:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #104
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_flipy_exp2_mod6:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #56
+        lda (spraddr),y
+        tax
+        ldy #112
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_flipy_exp1_mod7:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #120
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_flipy_exp2_mod7:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #64
+        lda (spraddr),y
+        tax
+        ldy #128
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_flipy_exp1_mod8:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #136
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_flipy_exp2_mod8:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+        ldy #72
+        lda (spraddr),y
+        tax
+        ldy #144
+        lda (scraddr),y
+        and masktable_exp1,x
+spr_plot_flipy_exp1_mod9:
+        ora ortable_exp1,x        
+        sta (scraddr),y 
+        ldy #152
+        lda (scraddr),y
+        and masktable_exp2,x
+spr_plot_flipy_exp2_mod9:
+        ora ortable_exp2,x        
+        sta (scraddr),y 
+
+spr_flipy_plot_nextline:
+        lda spraddr
+        .byte INC_A
+        .byte BIT_IMM, 7
+        bne +
+        
+        sec
+        sbc #8
+        clc
+        adc t+1
+        bcc +
+        
+        inc spraddr+1
+*       sta spraddr
+
+        lda scraddr
+        .byte BIT_IMM, 7
+        bne +
+        
+        clc
+        adc #8
+        dec scraddr+1
+        dec scraddr+1
+        
+*       .byte DEC_A
+        sta scraddr
+
+        dec t
+        beq +
+        jmp spr_flipy_plot_loopy
+        
+        
+*       lda scraddr
+        and #3
+        cmp #3
+        beq +
+
+        lda scraddr
+        and #$fc
+        sta scraddr              
+        jsr sprfin
+
+*       lda SPR_W
+        cmp #9
+        bcs +
+
+        ldx t+2
+        lda #$a0 ;LDY #
+        sta spr_flipy_mod_start,x
+        lda #$b1 ;LDA (),y
+        sta spr_flipy_mod_start+2,x
+        lda SPR_W
+        asl
+        asl
+        asl
+        sta spr_flipy_mod_start+1,x
+        
+        lda SPR_W
+        .byte DEC_A
+        asl
+        asl
+        asl
+        asl
+        tax
+        lda #$a0 ;LDY #
+        sta sprfin_mod_start,x
+
+*       lda #4
+        sta $f4
+        sta $fe30
+        rts
+
+
+
+
+
+
+spr_flipxy_plot:
+        ldx SPR_PALETTE
+        lda flip_ortables_exp1,x
+        sta spr_plot_flipxy_exp1_mod0+2
+        sta spr_plot_flipxy_exp1_mod1+2
+        sta spr_plot_flipxy_exp1_mod2+2
+        sta spr_plot_flipxy_exp1_mod3+2
+        sta spr_plot_flipxy_exp1_mod4+2
+        sta spr_plot_flipxy_exp1_mod5+2
+        sta spr_plot_flipxy_exp1_mod6+2
+        sta spr_plot_flipxy_exp1_mod7+2
+        sta spr_plot_flipxy_exp1_mod8+2
+        sta spr_plot_flipxy_exp1_mod9+2
+        lda flip_ortables_exp2,x
+        sta spr_plot_flipxy_exp2_mod0+2
+        sta spr_plot_flipxy_exp2_mod1+2
+        sta spr_plot_flipxy_exp2_mod2+2
+        sta spr_plot_flipxy_exp2_mod3+2
+        sta spr_plot_flipxy_exp2_mod4+2
+        sta spr_plot_flipxy_exp2_mod5+2
+        sta spr_plot_flipxy_exp2_mod6+2
+        sta spr_plot_flipxy_exp2_mod7+2
+        sta spr_plot_flipxy_exp2_mod8+2
+        sta spr_plot_flipxy_exp2_mod9+2
+
+        lda SPR_W
+        .byte DEC_A
+        asl
+        asl
+        asl
+        sta t
+        
+        lda scraddr
+        sec
+        sbc #152
+        sta scraddr
+        lda scraddr+1
+        sbc #0
+        sta scraddr+1
+
+        .byte STZ_ZP, t+5
+        lda SPR_W
+        cmp #9
+;        lda #0
+        bcs +
+
+        .byte DEC_A
+        sta t
+        asl
+        sta t+1
+        lda t
+        clc
+        adc t+1
+        sta t ;A*3
+        
+        lda t+1        
+        asl
+        asl
+        asl
+        asl
+        sec
+        sbc t
+        tax
+
+        lda #$4c; JMP
+        sta spr_flipxy_mod_start,x
+        lda #<spr_flipxy_plot_nextline
+        sta spr_flipxy_mod_start+1,x        
+        lda #>spr_flipxy_plot_nextline
+        sta spr_flipxy_mod_start+2,x
+        
+        stx t+2        
+
+        lda SPR_W
+        .byte DEC_A
+        asl
+        asl
+        asl
+        asl
+        tax
+        lda #$60 ;RTS
+        sta sprfin_flipx_mod_start,x
+
+*       lda SPR_H
+        sta t
+        lda SPR_W
+        asl
+        asl
+        asl
+        sta t+1
+
+spr_flipxy_plot_loopy:
+        .byte LDA_INDZP, spraddr
+        tax
+        ldy #152
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipxy_exp2_mod0:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #144
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipxy_exp1_mod0:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y 
+
+spr_flipxy_mod_start:
+        ldy #8
+        lda (spraddr),y
+        tax
+        ldy #136
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipxy_exp2_mod1:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y  ;2+5+2+5+4+4+6 = 28 cycles, 15 bytes 
+        ldy #128
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipxy_exp1_mod1:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y  ;2+5+2+2+5+4+4+6+2+5+4+4+6 = 51 cycles, 30 bytes   
+
+        ldy #16
+        lda (spraddr),y
+        tax
+        ldy #120
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipxy_exp2_mod2:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #112
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipxy_exp1_mod2:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #24
+        lda (spraddr),y
+        tax
+        ldy #104
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipxy_exp2_mod3:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #96
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipxy_exp1_mod3:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #32
+        lda (spraddr),y
+        tax
+        ldy #88
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipxy_exp2_mod4:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #80
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipxy_exp1_mod4:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #40
+        lda (spraddr),y
+        tax
+        ldy #72
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipxy_exp2_mod5:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #64
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipxy_exp1_mod5:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #48
+        lda (spraddr),y
+        tax
+        ldy #56
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipxy_exp2_mod6:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #48
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipxy_exp1_mod6:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #56
+        lda (spraddr),y
+        tax
+        ldy #40
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipxy_exp2_mod7:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #32
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipxy_exp1_mod7:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #64
+        lda (spraddr),y
+        tax
+        ldy #24
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipxy_exp2_mod8:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #16
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipxy_exp1_mod8:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y   
+
+        ldy #72
+        lda (spraddr),y
+        tax
+        ldy #8
+        lda (scraddr),y
+        and flip_masktable_exp2,x
+spr_plot_flipxy_exp2_mod9:
+        ora flip_ortable_exp2,x        
+        sta (scraddr),y 
+        ldy #0
+        lda (scraddr),y
+        and flip_masktable_exp1,x
+spr_plot_flipxy_exp1_mod9:
+        ora flip_ortable_exp1,x        
+        sta (scraddr),y
+
+spr_flipxy_plot_nextline:
+        lda spraddr
+        .byte INC_A
+        .byte BIT_IMM, 7
+        bne +
+        
+        sec
+        sbc #8
+        clc
+        adc t+1
+        bcc +
+        
+        inc spraddr+1
+*       sta spraddr
+
+        lda scraddr
+        .byte BIT_IMM, 7
+        bne +
+        
+        clc
+        adc #8
+        dec scraddr+1
+        dec scraddr+1
+        
+*       .byte DEC_A
+        sta scraddr
+
+        dec t
+        beq +
+        jmp spr_flipxy_plot_loopy
+        
+*       lda scraddr
+        and #3
+        cmp #3
+        beq +
+
+        lda scraddr
+        and #$fc
+        sta scraddr              
+        jsr sprfin_flipx
+
+*       lda SPR_W
+        cmp #9
+        bcs +
+
+        ldy #0
+        ldx t+2
+        lda #$a0 ;LDY #
+        sta spr_flipxy_mod_start,x
+        lda SPR_W
+        asl
+        asl
+        asl
+        sta spr_flipxy_mod_start+1,x
+        lda #$b1 ;LDA (),y
+        sta spr_flipxy_mod_start+2,x
+        
+        lda SPR_W
+        .byte DEC_A
+        asl
+        asl
+        asl
+        asl
+        tax
+        lda #$a0 ;LDY #
+        sta sprfin_flipx_mod_start,x
+        
+*       lda #4
+        sta $f4
+        sta $fe30
+        rts

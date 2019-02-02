@@ -1,0 +1,2364 @@
+;Single CPU tube plotter. Plots at 2x4 resolution in MODE 2
+
+.org $2b00
+
+.alias PIXCOUNT 1
+
+.alias MAPY $40
+
+.alias scraddr $50
+.alias mapaddr $52
+.alias tileaddr $54
+.alias spraddr $56
+.alias sprdat_addr $58
+.alias mapdat_addr $5a
+
+.alias BANK $61
+
+.alias t $70
+
+.alias x_1 $80
+.alias x_2 $81
+
+.alias XOFF $c30
+.alias YOFF $c34
+.alias YOFF_OLD $c38
+.alias YOFFL $c3c
+.alias XOFFL $c40
+.alias YOFFH $c44
+
+;.alias XOFF $82
+;.alias YOFF $83
+;.alias YOFF_OLD $84
+;.alias YOFFL $85
+;.alias XOFFL $86
+;.alias YOFFH $87
+
+.alias mapdat $400
+
+.alias y_dat $d800
+.alias x_dat $dc00
+
+.alias tiles $3c00
+.alias map $8400
+
+
+.alias BIT_IMM   $89
+.alias LDA_INDZP $b2
+.alias STA_INDZP $92
+.alias ADC_INDZP $72
+.alias JMP_INDX  $7c
+.alias PHX       $da
+.alias PHY       $5a
+.alias PLX       $fa
+.alias PLY       $7a
+.alias DEC_A     $3a
+.alias INC_A     $1a
+.alias STZ_ZP    $64
+
+
+.macro drawpix
+;        inc PIXCOUNT
+.macend
+
+.macro drawpix_total
+;        lda PIXCOUNT+1
+;        clc
+;        adc PIXCOUNT
+;        sta PIXCOUNT+1
+;        lda PIXCOUNT+2
+;        adc #0
+;        sta PIXCOUNT+2
+;        .byte STZ_ZP,PIXCOUNT
+.macend
+
+plotmap:
+        jmp plotmap_real
+        
+drawtube:
+        lda YOFF
+        sta yoffm1+1
+        sta yoffm2+1
+        sta yoffm3+1
+        sta yoffm4+1
+        sta yoffm5+1
+        sta yoffm6+1
+        sta yoffm7+1
+        sta yoffm8+1
+        sta yoffm9+1
+        sta yoffm10+1
+        sta yoffm11+1
+        sta yoffm12+1
+        sta yoffm13+1
+        sta yoffm14+1
+        sta yoffm15+1
+        sta yoffm16+1
+        sta yoffm17+1
+        sta yoffm18+1
+        sta yoffm19+1
+        sta yoffm20+1
+        sta yoffm21+1
+        sta yoffm22+1
+        sta yoffm23+1
+        sta yoffm24+1
+        sta yoffm25+1
+        sta yoffm26+1
+        sta yoffm27+1
+        sta yoffm28+1
+
+        lda XOFF
+        sta xoffm1+1
+        sta xoffm2+1
+        sta xoffm3+1
+        sta xoffm4+1
+        sta xoffm5+1
+        sta xoffm6+1
+        sta xoffm7+1
+        sta xoffm8+1
+        sta xoffm9+1
+        sta xoffm10+1
+        sta xoffm11+1
+        sta xoffm12+1
+        sta xoffm13+1
+        sta xoffm14+1
+        sta xoffm15+1
+        sta xoffm16+1
+        sta xoffm17+1
+        sta xoffm18+1
+        sta xoffm19+1
+        sta xoffm20+1
+        sta xoffm21+1
+        sta xoffm22+1
+        sta xoffm23+1
+        sta xoffm24+1
+        sta xoffm25+1
+        sta xoffm26+1
+        sta xoffm27+1
+        sta xoffm28+1
+        sta xoffm29+1
+        sta xoffm30+1
+        sta xoffm31+1
+        sta xoffm32+1
+        sta xoffm33+1
+        sta xoffm34+1
+        sta xoffm35+1
+        sta xoffm36+1
+        sta xoffm37+1
+        sta xoffm38+1
+        sta xoffm39+1
+        sta xoffm40+1
+        sta xoffm41+1
+        sta xoffm42+1
+        sta xoffm43+1
+        sta xoffm44+1
+        sta xoffm45+1
+        sta xoffm46+1
+        sta xoffm47+1
+        sta xoffm48+1
+        sta xoffm49+1
+        sta xoffm50+1
+        sta xoffm51+1
+        sta xoffm52+1
+        sta xoffm53+1
+        sta xoffm54+1
+        sta xoffm55+1
+        sta xoffm56+1
+
+        .byte STZ_ZP,PIXCOUNT
+        .byte STZ_ZP,PIXCOUNT+1
+        .byte STZ_ZP,PIXCOUNT+2
+        
+        ldx #0
+        jsr drawcolumn
+        ldx #8
+        jsr drawcolumn
+        `drawpix_total
+        ldx #16
+        jsr drawcolumn
+        ldx #24
+        jsr drawcolumn
+        `drawpix_total
+        ldx #32
+        jsr drawcolumn
+        ldx #40
+        jsr drawcolumn
+        `drawpix_total
+        ldx #48
+        jsr drawcolumn
+        ldx #56
+        jsr drawcolumn
+        `drawpix_total
+        ldx #64
+        jsr drawcolumn
+        ldx #72
+        jsr drawcolumn
+        `drawpix_total
+        ldx #80
+        jsr drawcolumn
+        ldx #88
+        jsr drawcolumn
+        `drawpix_total
+        ldx #96
+        jsr drawcolumn
+        ldx #104
+        jsr drawcolumn
+        `drawpix_total
+        ldx #112
+        jsr drawcolumn
+        ldx #120
+        jsr drawcolumn
+        `drawpix_total
+        ldx #128
+        jsr drawcolumn
+        ldx #136
+        jsr drawcolumn
+        `drawpix_total
+        ldx #144
+        jsr drawcolumn
+        ldx #152
+        jsr drawcolumn
+        `drawpix_total
+        ldx #160
+        jsr drawcolumn
+        ldx #168
+        jsr drawcolumn
+        `drawpix_total
+        ldx #176
+        jsr drawcolumn
+        ldx #184
+        jsr drawcolumn
+        `drawpix_total
+        ldx #192
+        jsr drawcolumn
+        ldx #200
+        jsr drawcolumn
+        `drawpix_total
+        ldx #208
+        jsr drawcolumn
+        lda #$60 ;RTS
+        sta drawmod30
+        ldx #216
+        jsr drawcolumn
+        `drawpix_total
+        lda #$60 ;RTS
+        sta drawmod28
+        ldx #224
+        jsr drawcolumn
+        ldx #232
+        jsr drawcolumn
+        `drawpix_total
+        lda #$60 ;RTS
+        sta drawmod27
+        ldx #240
+        jsr drawcolumn
+        ldx #248
+        jsr drawcolumn
+        `drawpix_total
+                
+        lda #$A6 ;LDX zp
+        sta drawmod27
+        sta drawmod28
+        sta drawmod30
+
+        rts
+        
+        lsr PIXCOUNT+2
+        ror PIXCOUNT+1
+        lsr PIXCOUNT+2
+        ror PIXCOUNT+1
+        lsr PIXCOUNT+2
+        ror PIXCOUNT+1
+        lsr PIXCOUNT+2
+        ror PIXCOUNT+1
+        lsr PIXCOUNT+2
+        ror PIXCOUNT+1
+        lsr PIXCOUNT+2
+        ror PIXCOUNT+1
+        beq +
+
+        lda #$7a
+        sta t+1
+        lda #0
+        sta t
+        
+        ldx #0        
+        
+*       lda #$ff
+        ldy #7
+*       sta (t),y
+        dey
+        bpl -
+        
+        lda t
+        clc
+        adc #8
+        sta t
+        bne +
+        inc t+1
+        
+*       dec PIXCOUNT+1
+        bne ---        
+
+
+*       rts
+
+
+
+
+drawcolumn:
+        lda #0
+        sta t+4
+        sta t+6
+        sta t+8
+        sta t+10
+        
+        stx x_1
+        lda #248
+        sec
+        sbc x_1
+        sta x_2
+
+;        ldx x_1            ;3
+;        lda y_dat+$000,x   ;4
+;        clc                ;2
+;        adc YOFF           ;3
+;        and #$fc           ;2
+;        tay                ;2 = 18
+;        lda x_dat+$000,x   ;4
+;        clc                ;2
+;        adc XOFF           ;3
+;        lsr                ;2
+;        lsr                ;2
+;        ora #$80           ;2
+;        sta t+5            ;3
+;        eor #$20           ;2
+;        sta t+11           ;3 = 23
+;        lda XOFF           ;3
+;        clc                ;2
+;        sbc x_dat+$000,x   ;4
+;        lsr                ;2
+;        lsr                ;2
+;        ora #$80           ;2
+;        sta t+7            ;3
+;        eor #$20           ;2     
+;        sta t+9            ;3 = 23
+;        lda (t+4),y        ;5
+;        sta $4000,x        ;5
+;        sta $4001,x        ;5
+;        sta $4002,x        ;5
+;        sta $4003,x        ;5 = 28
+;        lda (t+8),y        ;5
+;        sta $7e04,x        ;5
+;        sta $7e05,x        ;5
+;        sta $7e06,x        ;5
+;        sta $7e07,x        ;5 = 25
+;        ldx x_2            ;3
+;        lda (t+6),y        ;5
+;        sta $4100,x        ;5
+;        sta $4101,x        ;5
+;        sta $4102,x        ;5
+;        sta $4103,x        ;5 = 28
+;        lda (t+10),y       ;5 
+;        sta $7f04,x        ;5
+;        sta $7f05,x        ;5
+;        sta $7f06,x        ;5
+;        sta $7f07,x        ;5 = 25
+                           ; = 168 cycles for 4 pixels
+                           ; 4096 pixels = 172032 cycles per frame = 11.63 fps
+                           ; 4096-208 = 3888 pixels = 163296 cycles per frame = 12.25 fps
+                           ; 3584-208 = 3376 pixels = 141792 cycles per frame = 14.11 fps  
+
+
+;        ldx x_1            ;3
+;        ldy x_dat+$000,x   ;4
+;        lda xoff2_dat,y    ;4
+;        sta t+7            ;3
+;        eor #$20           ;2
+;        sta t+9            ;3 = 19
+
+;        ldy x_dat+$000,x   ;4
+;        lda xoff_dat,y     ;4
+;        sta t+5            ;3
+;        eor #$20           ;2
+;        sta t+11           ;3 = 16
+
+;        ldy y_dat+$000,x   ;4
+;        lda yoff_dat,y     ;4
+;        tay                ;2 = 10
+
+;        lda (t+4),y        ;5
+;        sta $4000,x        ;5
+;        sta $4001,x        ;5
+;        sta $4002,x        ;5
+;        sta $4003,x        ;5 = 28
+;        lda (t+8),y        ;5
+;        sta $7e04,x        ;5
+;        sta $7e05,x        ;5
+;        sta $7e06,x        ;5
+;        sta $7e07,x        ;5 = 25
+;        ldx x_2            ;3
+;        lda (t+6),y        ;5
+;        sta $4100,x        ;5
+;        sta $4101,x        ;5
+;        sta $4102,x        ;5
+;        sta $4103,x        ;5 = 28
+;        lda (t+10),y       ;5 
+;        sta $7f04,x        ;5
+;        sta $7f05,x        ;5
+;        sta $7f06,x        ;5
+;        sta $7f07,x        ;5 = 25
+                           ; = 151 cycles for 4 pixels
+                           ; 3584-208 = 3376 pixels = 127444 cycles per frame = 15.69 fps
+                           ; + 14848 cycles = 142292 cycles per frame
+                           
+;*       txa                ;2
+;        clc                ;2
+;        adc #0 ;XOFF       ;2
+;        lsr                ;2
+;        lsr                ;2
+;        ora #$80           ;2
+;        sta xoff_dat,x     ;5 = 17
+;        
+;        lda #0 ;XOFF       ;2
+;        clc                ;2
+;        sbc array_full,x   ;4
+;        lsr                ;2
+;        lsr                ;2
+;        ora #$80           ;2
+;        sta xoff2_dat,x    ;5 = 19
+;
+;        txa                ;2
+;        clc                ;2
+;        adc #0 ;YOFF       ;2
+;        lsr                ;2
+;        lsr                ;2
+;        sta yoff_dat,x     ;5 = 17
+;        
+;        inx                ;2
+;        bne -              ;3 = 5        
+;;                          17+19+17+5 = 14848 cycles 
+
+;        ldx x_1
+;        lda y_dat+$001,x
+;        clc
+;        adc YOFF
+;        lsr
+;        lsr
+;        tay
+;        lda x_dat+$001,x                                                          
+;        clc
+;        adc XOFF
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+5
+;        eor #$20
+;        sta t+11       
+;        lda XOFF
+;        clc
+;        sbc x_dat+$001,x
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+7
+;        eor #$20                
+;        sta t+9
+;        lda (t+4),y        
+;        sta $4004,x
+;        sta $4005,x        
+;        sta $4006,x
+;        sta $4007,x        
+;        lda (t+8),y        
+;        sta $7e00,x
+;        sta $7e01,x        
+;        sta $7e02,x
+;        sta $7e03,x        
+;        ldx x_2
+;        lda (t+6),y        
+;        sta $4104,x
+;        sta $4105,x        
+;        sta $4106,x
+;        sta $4107,x        
+;        lda (t+10),y        
+;        sta $7f00,x
+;        sta $7f01,x        
+;        sta $7f02,x
+;        sta $7f03,x        
+
+;        ldx x_1
+;        lda y_dat+$002,x
+;        clc
+;        adc YOFF
+;        lsr
+;        lsr
+;        tay
+;        lda x_dat+$002,x
+;        clc
+;        adc XOFF
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+5
+;        eor #$20
+;        sta t+11       
+;        lda XOFF
+;        clc
+;        sbc x_dat+$002,x
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+7
+;        eor #$20                
+;        sta t+9
+;        lda (t+4),y        
+;        sta $4200,x
+;        sta $4201,x        
+;        sta $4202,x
+;        sta $4203,x        
+;        lda (t+8),y        
+;        sta $7c04,x
+;        sta $7c05,x        
+;        sta $7c06,x
+;        sta $7c07,x        
+;        ldx x_2
+;        lda (t+6),y        
+;        sta $4300,x
+;        sta $4301,x        
+;        sta $4302,x
+;        sta $4303,x        
+;        lda (t+10),y        
+;        sta $7d04,x
+;        sta $7d05,x        
+;        sta $7d06,x
+;        sta $7d07,x        
+
+;        ldx x_1
+;        lda y_dat+$003,x
+;        clc
+;        adc YOFF
+;        lsr
+;        lsr
+;        tay
+;        lda x_dat+$003,x
+;        clc
+;        adc XOFF
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+5
+;        eor #$20
+;        sta t+11       
+;        lda XOFF
+;        clc
+;        sbc x_dat+$003,x
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+7
+;        eor #$20                
+;        sta t+9
+;        lda (t+4),y        
+;        sta $4204,x
+;        sta $4205,x        
+;        sta $4206,x
+;        sta $4207,x        
+;        lda (t+8),y        
+;        sta $7c00,x
+;        sta $7c01,x        
+;        sta $7c02,x
+;        sta $7c03,x        
+;        ldx x_2
+;        lda (t+6),y        
+;        sta $4304,x
+;        sta $4305,x        
+;        sta $4306,x
+;        sta $4307,x        
+;        lda (t+10),y        
+;        sta $7d00,x
+;        sta $7d01,x        
+;        sta $7d02,x
+;        sta $7d03,x        
+
+        ldx x_1
+        lda y_dat+$004,x
+        clc
+yoffm1: adc #0
+        tay
+        lda x_dat+$004,x
+        clc
+xoffm1: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm2: lda #0
+        clc
+        sbc x_dat+$004,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y
+        cmp $4400,x
+        beq +
+        `drawpix        
+        sta $4400,x
+        sta $4401,x        
+        sta $4402,x
+        sta $4403,x        
+*       lda (t+8),y        
+        cmp $7a04,x
+        beq +        
+        `drawpix
+        sta $7a04,x
+        sta $7a05,x        
+        sta $7a06,x
+        sta $7a07,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4500,x
+        beq +        
+        `drawpix
+        sta $4500,x
+        sta $4501,x        
+        sta $4502,x
+        sta $4503,x        
+*       lda (t+10),y        
+        cmp $7b04,x
+        beq +        
+        `drawpix
+        sta $7b04,x
+        sta $7b05,x        
+        sta $7b06,x
+        sta $7b07,x        
+
+*       ldx x_1
+        lda y_dat+$005,x
+        clc
+yoffm2: adc #0
+        tay
+        lda x_dat+$005,x
+        clc
+xoffm3: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm4: lda #0
+        clc
+        sbc x_dat+$005,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $4404,x
+        beq +        
+        `drawpix
+        sta $4404,x
+        sta $4405,x        
+        sta $4406,x
+        sta $4407,x        
+*       lda (t+8),y        
+        cmp $7a00,x
+        beq +        
+        `drawpix
+        sta $7a00,x
+        sta $7a01,x        
+        sta $7a02,x
+        sta $7a03,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4504,x
+        beq +        
+        `drawpix
+        sta $4504,x
+        sta $4505,x        
+        sta $4506,x
+        sta $4507,x        
+*       lda (t+10),y        
+        cmp $7b00,x
+        beq +        
+        `drawpix
+        sta $7b00,x
+        sta $7b01,x        
+        sta $7b02,x
+        sta $7b03,x        
+
+*       ldx x_1
+        lda y_dat+$006,x
+        clc
+yoffm3: adc #0
+        tay
+        lda x_dat+$006,x
+        clc
+xoffm5: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm6: lda #0
+        clc
+        sbc x_dat+$006,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $4600,x
+        beq +        
+        `drawpix
+        sta $4600,x
+        sta $4601,x        
+        sta $4602,x
+        sta $4603,x        
+*       lda (t+8),y        
+        cmp $7804,x
+        beq +        
+        `drawpix
+        sta $7804,x
+        sta $7805,x        
+        sta $7806,x
+        sta $7807,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4700,x
+        beq +        
+        `drawpix
+        sta $4700,x
+        sta $4701,x        
+        sta $4702,x
+        sta $4703,x        
+*       lda (t+10),y        
+        cmp $7904,x
+        beq +        
+        `drawpix
+        sta $7904,x
+        sta $7905,x        
+        sta $7906,x
+        sta $7907,x        
+
+*       ldx x_1
+        lda y_dat+$007,x
+        clc
+yoffm4: adc #0
+        tay
+        lda x_dat+$007,x
+        clc
+xoffm7: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm8: lda #0
+        clc
+        sbc x_dat+$007,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $4604,x
+        beq +        
+        `drawpix
+        sta $4604,x
+        sta $4605,x        
+        sta $4606,x
+        sta $4607,x        
+*       lda (t+8),y        
+        cmp $7800,x
+        beq +        
+        `drawpix
+        sta $7800,x
+        sta $7801,x        
+        sta $7802,x
+        sta $7803,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4704,x
+        beq +        
+        `drawpix
+        sta $4704,x
+        sta $4705,x        
+        sta $4706,x
+        sta $4707,x        
+*       lda (t+10),y        
+        cmp $7900,x
+        beq +        
+        `drawpix
+        sta $7900,x
+        sta $7901,x        
+        sta $7902,x
+        sta $7903,x        
+
+
+
+
+
+
+*       ldx x_1
+        lda y_dat+$100,x
+        clc
+yoffm5: adc #0
+        tay
+        lda x_dat+$100,x
+        clc
+xoffm9: adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm10:lda #0
+        clc
+        sbc x_dat+$100,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $4800,x
+        beq +        
+        `drawpix
+        sta $4800,x
+        sta $4801,x        
+        sta $4802,x
+        sta $4803,x        
+*       lda (t+8),y        
+        cmp $7604,x
+        beq +        
+        `drawpix
+        sta $7604,x
+        sta $7605,x        
+        sta $7606,x
+        sta $7607,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4900,x
+        beq +        
+        `drawpix
+        sta $4900,x
+        sta $4901,x        
+        sta $4902,x
+        sta $4903,x        
+*       lda (t+10),y        
+        cmp $7704,x
+        beq +        
+        `drawpix
+        sta $7704,x
+        sta $7705,x        
+        sta $7706,x
+        sta $7707,x        
+
+*       ldx x_1
+        lda y_dat+$101,x
+        clc
+yoffm6: adc #0
+        tay
+        lda x_dat+$101,x
+        clc
+xoffm11:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm12:lda #0
+        clc
+        sbc x_dat+$101,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $4804,x
+        beq +        
+        `drawpix
+        sta $4804,x
+        sta $4805,x        
+        sta $4806,x
+        sta $4807,x        
+*       lda (t+8),y        
+        cmp $7600,x
+        beq +        
+        `drawpix
+        sta $7600,x
+        sta $7601,x        
+        sta $7602,x
+        sta $7603,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4904,x
+        beq +        
+        `drawpix
+        sta $4904,x
+        sta $4905,x        
+        sta $4906,x
+        sta $4907,x        
+*       lda (t+10),y        
+        cmp $7700,x
+        beq +        
+        `drawpix
+        sta $7700,x
+        sta $7701,x        
+        sta $7702,x
+        sta $7703,x        
+
+*       ldx x_1
+        lda y_dat+$102,x
+        clc
+yoffm7: adc #0
+        tay
+        lda x_dat+$102,x
+        clc
+xoffm13:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm14:lda #0
+        clc
+        sbc x_dat+$102,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $4a00,x
+        beq +        
+        `drawpix
+        sta $4a00,x
+        sta $4a01,x        
+        sta $4a02,x
+        sta $4a03,x        
+*       lda (t+8),y        
+        cmp $7404,x
+        beq +        
+        `drawpix
+        sta $7404,x
+        sta $7405,x        
+        sta $7406,x
+        sta $7407,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4b00,x
+        beq +        
+        `drawpix
+        sta $4b00,x
+        sta $4b01,x        
+        sta $4b02,x
+        sta $4b03,x        
+*       lda (t+10),y        
+        cmp $7504,x
+        beq +        
+        `drawpix
+        sta $7504,x
+        sta $7505,x        
+        sta $7506,x
+        sta $7507,x        
+
+*       ldx x_1
+        lda y_dat+$103,x
+        clc
+yoffm8: adc #0
+        tay
+        lda x_dat+$103,x
+        clc
+xoffm15:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm16:lda #0
+        clc
+        sbc x_dat+$103,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $4a04,x
+        beq +        
+        `drawpix
+        sta $4a04,x
+        sta $4a05,x        
+        sta $4a06,x
+        sta $4a07,x        
+*       lda (t+8),y        
+        cmp $7400,x
+        beq +        
+        `drawpix
+        sta $7400,x
+        sta $7401,x        
+        sta $7402,x
+        sta $7403,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4b04,x
+        beq +        
+        `drawpix
+        sta $4b04,x
+        sta $4b05,x        
+        sta $4b06,x
+        sta $4b07,x        
+*       lda (t+10),y        
+        cmp $7500,x
+        beq +        
+        `drawpix
+        sta $7500,x
+        sta $7501,x        
+        sta $7502,x
+        sta $7503,x        
+
+*       ldx x_1
+        lda y_dat+$104,x
+        clc
+yoffm9: adc #0
+        tay
+        lda x_dat+$104,x
+        clc
+xoffm17:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm18:lda #0
+        clc
+        sbc x_dat+$104,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $4c00,x
+        beq +        
+        `drawpix
+        sta $4c00,x
+        sta $4c01,x        
+        sta $4c02,x
+        sta $4c03,x        
+*       lda (t+8),y        
+        cmp $7204,x
+        beq +        
+        `drawpix
+        sta $7204,x
+        sta $7205,x        
+        sta $7206,x
+        sta $7207,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4d00,x
+        beq +        
+        `drawpix
+        sta $4d00,x
+        sta $4d01,x        
+        sta $4d02,x
+        sta $4d03,x        
+*       lda (t+10),y        
+        cmp $7304,x
+        beq +        
+        `drawpix
+        sta $7304,x
+        sta $7305,x        
+        sta $7306,x
+        sta $7307,x        
+
+*       ldx x_1
+        lda y_dat+$105,x
+        clc
+yoffm10:adc #0
+        tay
+        lda x_dat+$105,x
+        clc
+xoffm19:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm20:lda #0
+        clc
+        sbc x_dat+$105,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $4c04,x
+        beq +        
+        `drawpix
+        sta $4c04,x
+        sta $4c05,x        
+        sta $4c06,x
+        sta $4c07,x        
+*       lda (t+8),y        
+        cmp $7200,x
+        beq +        
+        `drawpix
+        sta $7200,x
+        sta $7201,x        
+        sta $7202,x
+        sta $7203,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4d04,x
+        beq +        
+        `drawpix
+        sta $4d04,x
+        sta $4d05,x        
+        sta $4d06,x
+        sta $4d07,x        
+*       lda (t+10),y        
+        cmp $7300,x
+        beq +        
+        `drawpix
+        sta $7300,x
+        sta $7301,x        
+        sta $7302,x
+        sta $7303,x        
+
+*       ldx x_1
+        lda y_dat+$106,x
+        clc
+yoffm11:adc #0
+        tay
+        lda x_dat+$106,x
+        clc
+xoffm21:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm22:lda #0
+        clc
+        sbc x_dat+$106,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $4e00,x
+        beq +        
+        `drawpix
+        sta $4e00,x
+        sta $4e01,x        
+        sta $4e02,x
+        sta $4e03,x        
+*       lda (t+8),y        
+        cmp $7004,x
+        beq +        
+        `drawpix
+        sta $7004,x
+        sta $7005,x        
+        sta $7006,x
+        sta $7007,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4f00,x
+        beq +        
+        `drawpix
+        sta $4f00,x
+        sta $4f01,x        
+        sta $4f02,x
+        sta $4f03,x        
+*       lda (t+10),y        
+        cmp $7104,x
+        beq +        
+        `drawpix
+        sta $7104,x
+        sta $7105,x        
+        sta $7106,x
+        sta $7107,x        
+
+*       ldx x_1
+        lda y_dat+$107,x
+        clc
+yoffm12:adc #0
+        tay
+        lda x_dat+$107,x
+        clc
+xoffm23:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm24:lda #0
+        clc
+        sbc x_dat+$107,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $4e04,x
+        beq +        
+        `drawpix
+        sta $4e04,x
+        sta $4e05,x        
+        sta $4e06,x
+        sta $4e07,x        
+*       lda (t+8),y        
+        cmp $7000,x
+        beq +        
+        `drawpix
+        sta $7000,x
+        sta $7001,x        
+        sta $7002,x
+        sta $7003,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $4f04,x
+        beq +        
+        `drawpix
+        sta $4f04,x
+        sta $4f05,x        
+        sta $4f06,x
+        sta $4f07,x        
+*       lda (t+10),y        
+        cmp $7100,x
+        beq +        
+        `drawpix
+        sta $7100,x
+        sta $7101,x        
+        sta $7102,x
+        sta $7103,x        
+
+
+
+
+*       ldx x_1
+        lda y_dat+$200,x
+        clc
+yoffm13:adc #0
+        tay
+        lda x_dat+$200,x
+        clc
+xoffm25:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm26:lda #0
+        clc
+        sbc x_dat+$200,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5000,x
+        beq +        
+        `drawpix
+        sta $5000,x
+        sta $5001,x        
+        sta $5002,x
+        sta $5003,x        
+*       lda (t+8),y        
+        cmp $6e04,x
+        beq +        
+        `drawpix
+        sta $6e04,x
+        sta $6e05,x        
+        sta $6e06,x
+        sta $6e07,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5100,x
+        beq +        
+        `drawpix
+        sta $5100,x
+        sta $5101,x        
+        sta $5102,x
+        sta $5103,x        
+*       lda (t+10),y        
+        cmp $6f04,x
+        beq +        
+        `drawpix
+        sta $6f04,x
+        sta $6f05,x        
+        sta $6f06,x
+        sta $6f07,x        
+
+*       ldx x_1
+        lda y_dat+$201,x
+        clc
+yoffm14:adc #0
+        tay
+        lda x_dat+$201,x
+        clc
+xoffm27:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm28:lda #0
+        clc
+        sbc x_dat+$201,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5004,x
+        beq +        
+        `drawpix
+        sta $5004,x
+        sta $5005,x        
+        sta $5006,x
+        sta $5007,x        
+*       lda (t+8),y        
+        cmp $6e00,x
+        beq +        
+        `drawpix
+        sta $6e00,x
+        sta $6e01,x        
+        sta $6e02,x
+        sta $6e03,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5104,x
+        beq +        
+        `drawpix
+        sta $5104,x
+        sta $5105,x        
+        sta $5106,x
+        sta $5107,x        
+*       lda (t+10),y        
+        cmp $6f00,x
+        beq +        
+        `drawpix
+        sta $6f00,x
+        sta $6f01,x        
+        sta $6f02,x
+        sta $6f03,x        
+
+*       ldx x_1
+        lda y_dat+$202,x
+        clc
+yoffm15:adc #0
+        tay
+        lda x_dat+$202,x
+        clc
+xoffm29:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm30:lda #0
+        clc
+        sbc x_dat+$202,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5200,x
+        beq +        
+        `drawpix
+        sta $5200,x
+        sta $5201,x        
+        sta $5202,x
+        sta $5203,x        
+*       lda (t+8),y        
+        cmp $6c04,x
+        beq +        
+        `drawpix
+        sta $6c04,x
+        sta $6c05,x        
+        sta $6c06,x
+        sta $6c07,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5300,x
+        beq +        
+        `drawpix
+        sta $5300,x
+        sta $5301,x        
+        sta $5302,x
+        sta $5303,x        
+*       lda (t+10),y        
+        cmp $6d04,x
+        beq +        
+        `drawpix
+        sta $6d04,x
+        sta $6d05,x        
+        sta $6d06,x
+        sta $6d07,x        
+
+*       ldx x_1
+        lda y_dat+$203,x
+        clc
+yoffm16:adc #0
+        tay
+        lda x_dat+$203,x
+        clc
+xoffm31:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm32:lda #0
+        clc
+        sbc x_dat+$203,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5204,x
+        beq +        
+        `drawpix
+        sta $5204,x
+        sta $5205,x        
+        sta $5206,x
+        sta $5207,x        
+*       lda (t+8),y        
+        cmp $6c00,x
+        beq +        
+        `drawpix
+        sta $6c00,x
+        sta $6c01,x        
+        sta $6c02,x
+        sta $6c03,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5304,x
+        beq +        
+        `drawpix
+        sta $5304,x
+        sta $5305,x        
+        sta $5306,x
+        sta $5307,x        
+*       lda (t+10),y        
+        cmp $6d00,x
+        beq +        
+        `drawpix
+        sta $6d00,x
+        sta $6d01,x        
+        sta $6d02,x
+        sta $6d03,x        
+
+*       ldx x_1
+        lda y_dat+$204,x
+        clc
+yoffm17:adc #0
+        tay
+        lda x_dat+$204,x
+        clc
+xoffm33:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm34:lda #0
+        clc
+        sbc x_dat+$204,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5400,x
+        beq +        
+        `drawpix
+        sta $5400,x
+        sta $5401,x        
+        sta $5402,x
+        sta $5403,x        
+*       lda (t+8),y        
+        cmp $6a04,x
+        beq +        
+        `drawpix
+        sta $6a04,x
+        sta $6a05,x        
+        sta $6a06,x
+        sta $6a07,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5500,x
+        beq +        
+        `drawpix
+        sta $5500,x
+        sta $5501,x        
+        sta $5502,x
+        sta $5503,x        
+*       lda (t+10),y        
+        cmp $6b04,x
+        beq +        
+        `drawpix
+        sta $6b04,x
+        sta $6b05,x        
+        sta $6b06,x
+        sta $6b07,x        
+
+*       ldx x_1
+        lda y_dat+$205,x
+        clc
+yoffm18:adc #0
+        tay
+        lda x_dat+$205,x
+        clc
+xoffm35:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm36:lda #0
+        clc
+        sbc x_dat+$205,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5404,x
+        beq +        
+        `drawpix
+        sta $5404,x
+        sta $5405,x        
+        sta $5406,x
+        sta $5407,x        
+*       lda (t+8),y        
+        cmp $6a00,x
+        beq +        
+        `drawpix
+        sta $6a00,x
+        sta $6a01,x        
+        sta $6a02,x
+        sta $6a03,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5504,x
+        beq +        
+        `drawpix
+        sta $5504,x
+        sta $5505,x        
+        sta $5506,x
+        sta $5507,x        
+*       lda (t+10),y        
+        cmp $6b00,x
+        beq +        
+        `drawpix
+        sta $6b00,x
+        sta $6b01,x        
+        sta $6b02,x
+        sta $6b03,x        
+
+*       ldx x_1
+        lda y_dat+$206,x
+        clc
+yoffm19:adc #0
+        tay
+        lda x_dat+$206,x
+        clc
+xoffm37:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm38:lda #0
+        clc
+        sbc x_dat+$206,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5600,x
+        beq +        
+        `drawpix
+        sta $5600,x
+        sta $5601,x        
+        sta $5602,x
+        sta $5603,x        
+*       lda (t+8),y        
+        cmp $6804,x
+        beq +        
+        `drawpix
+        sta $6804,x
+        sta $6805,x        
+        sta $6806,x
+        sta $6807,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5700,x
+        beq +        
+        `drawpix
+        sta $5700,x
+        sta $5701,x        
+        sta $5702,x
+        sta $5703,x        
+*       lda (t+10),y        
+        cmp $6904,x
+        beq +        
+        `drawpix
+        sta $6904,x
+        sta $6905,x        
+        sta $6906,x
+        sta $6907,x        
+*
+        ldx x_1
+        lda y_dat+$207,x
+        clc
+yoffm20:adc #0
+        tay
+        lda x_dat+$207,x
+        clc
+xoffm39:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm40:lda #0
+        clc
+        sbc x_dat+$207,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5604,x
+        beq +        
+        `drawpix
+        sta $5604,x
+        sta $5605,x        
+        sta $5606,x
+        sta $5607,x        
+*       lda (t+8),y        
+        cmp $6800,x
+        beq +        
+        `drawpix
+        sta $6800,x
+        sta $6801,x        
+        sta $6802,x
+        sta $6803,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5704,x
+        beq +        
+        `drawpix
+        sta $5704,x
+        sta $5705,x        
+        sta $5706,x
+        sta $5707,x        
+*       lda (t+10),y        
+        cmp $6900,x
+        beq +        
+        `drawpix
+        sta $6900,x
+        sta $6901,x        
+        sta $6902,x
+        sta $6903,x        
+
+
+
+
+
+
+*       ldx x_1
+        lda y_dat+$300,x
+        clc
+yoffm21:adc #0
+        tay
+        lda x_dat+$300,x
+        clc
+xoffm41:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm42:lda #0
+        clc
+        sbc x_dat+$300,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5800,x
+        beq +        
+        `drawpix
+        sta $5800,x
+        sta $5801,x        
+        sta $5802,x
+        sta $5803,x        
+*       lda (t+8),y        
+        cmp $6604,x
+        beq +        
+        `drawpix
+        sta $6604,x
+        sta $6605,x        
+        sta $6606,x
+        sta $6607,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5900,x
+        beq +        
+        `drawpix
+        sta $5900,x
+        sta $5901,x        
+        sta $5902,x
+        sta $5903,x        
+*       lda (t+10),y        
+        cmp $6704,x
+        beq +        
+        `drawpix
+        sta $6704,x
+        sta $6705,x        
+        sta $6706,x
+        sta $6707,x        
+*
+        ldx x_1
+        lda y_dat+$301,x
+        clc
+yoffm22:adc #0
+        tay
+        lda x_dat+$301,x
+        clc
+xoffm43:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm44:lda #0
+        clc
+        sbc x_dat+$301,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5804,x
+        beq +        
+        `drawpix
+        sta $5804,x
+        sta $5805,x        
+        sta $5806,x
+        sta $5807,x        
+*       lda (t+8),y        
+        cmp $6600,x
+        beq +        
+        `drawpix
+        sta $6600,x
+        sta $6601,x        
+        sta $6602,x
+        sta $6603,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5904,x
+        beq +        
+        `drawpix
+        sta $5904,x
+        sta $5905,x        
+        sta $5906,x
+        sta $5907,x        
+*       lda (t+10),y        
+        cmp $6700,x
+        beq +        
+        `drawpix
+        sta $6700,x
+        sta $6701,x        
+        sta $6702,x
+        sta $6703,x        
+*
+        ldx x_1
+        lda y_dat+$302,x
+        clc
+yoffm23:adc #0
+        tay
+        lda x_dat+$302,x
+        clc
+xoffm45:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm46:lda #0
+        clc
+        sbc x_dat+$302,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5a00,x
+        beq +        
+        `drawpix
+        sta $5a00,x
+        sta $5a01,x        
+        sta $5a02,x
+        sta $5a03,x        
+*       lda (t+8),y        
+        cmp $6404,x
+        beq +        
+        `drawpix
+        sta $6404,x
+        sta $6405,x        
+        sta $6406,x
+        sta $6407,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5b00,x
+        beq +        
+        `drawpix
+        sta $5b00,x
+        sta $5b01,x        
+        sta $5b02,x
+        sta $5b03,x        
+*       lda (t+10),y        
+        cmp $6504,x
+        beq +        
+        `drawpix
+        sta $6504,x
+        sta $6505,x        
+        sta $6506,x
+        sta $6507,x        
+*
+drawmod27:
+        ldx x_1
+        lda y_dat+$303,x
+        clc
+yoffm24:adc #0
+        tay
+        lda x_dat+$303,x
+        clc
+xoffm47:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm48:lda #0
+        clc
+        sbc x_dat+$303,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5a04,x
+        beq +        
+        `drawpix
+        sta $5a04,x
+        sta $5a05,x        
+        sta $5a06,x
+        sta $5a07,x        
+*       lda (t+8),y        
+        cmp $6400,x
+        beq +        
+        `drawpix
+        sta $6400,x
+        sta $6401,x        
+        sta $6402,x
+        sta $6403,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5b04,x
+        beq +        
+        `drawpix
+        sta $5b04,x
+        sta $5b05,x        
+        sta $5b06,x
+        sta $5b07,x        
+*       lda (t+10),y        
+        cmp $6500,x
+        beq +        
+        `drawpix
+        sta $6500,x
+        sta $6501,x        
+        sta $6502,x
+        sta $6503,x        
+
+drawmod28:
+*       ldx x_1
+        lda y_dat+$304,x
+        clc
+yoffm25:adc #0
+        tay
+        lda x_dat+$304,x
+        clc
+xoffm49:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm50:lda #0
+        clc
+        sbc x_dat+$304,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5c00,x
+        beq +        
+        `drawpix
+        sta $5c00,x
+        sta $5c01,x        
+        sta $5c02,x
+        sta $5c03,x        
+*       lda (t+8),y        
+        cmp $6204,x
+        beq +        
+        `drawpix
+        sta $6204,x
+        sta $6205,x        
+        sta $6206,x
+        sta $6207,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5d00,x
+        beq +        
+        `drawpix
+        sta $5d00,x
+        sta $5d01,x        
+        sta $5d02,x
+        sta $5d03,x        
+*       lda (t+10),y        
+        cmp $6304,x
+        beq +        
+        `drawpix
+        sta $6304,x
+        sta $6305,x        
+        sta $6306,x
+        sta $6307,x        
+*
+        ldx x_1
+        lda y_dat+$305,x
+        clc
+yoffm26:adc #0
+        tay
+        lda x_dat+$305,x
+        clc
+xoffm51:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm52:lda #0
+        clc
+        sbc x_dat+$305,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5c04,x
+        beq +        
+        `drawpix
+        sta $5c04,x
+        sta $5c05,x        
+        sta $5c06,x
+        sta $5c07,x        
+*       lda (t+8),y        
+        cmp $6200,x
+        beq +        
+        `drawpix
+        sta $6200,x
+        sta $6201,x        
+        sta $6202,x
+        sta $6203,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5d04,x
+        beq +        
+        `drawpix
+        sta $5d04,x
+        sta $5d05,x        
+        sta $5d06,x
+        sta $5d07,x        
+*       lda (t+10),y        
+        cmp $6300,x
+        beq +        
+        `drawpix
+        sta $6300,x
+        sta $6301,x        
+        sta $6302,x
+        sta $6303,x        
+*
+drawmod30:
+        ldx x_1
+        lda y_dat+$306,x
+        clc
+yoffm27:adc #0
+        tay
+        lda x_dat+$306,x
+        clc
+xoffm53:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm54:lda #0
+        clc
+        sbc x_dat+$306,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5e00,x
+        beq +        
+        `drawpix
+        sta $5e00,x
+        sta $5e01,x        
+        sta $5e02,x
+        sta $5e03,x        
+*       lda (t+8),y        
+        cmp $6004,x
+        beq +        
+        `drawpix
+        sta $6004,x
+        sta $6005,x        
+        sta $6006,x
+        sta $6007,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5f00,x
+        beq +        
+        `drawpix
+        sta $5f00,x
+        sta $5f01,x        
+        sta $5f02,x
+        sta $5f03,x        
+*       lda (t+10),y        
+        cmp $6104,x
+        beq +        
+        `drawpix
+        sta $6104,x
+        sta $6105,x        
+        sta $6106,x
+        sta $6107,x        
+*
+        ldx x_1
+        lda y_dat+$307,x
+        clc
+yoffm28:adc #0
+        tay
+        lda x_dat+$307,x
+        clc
+xoffm55:adc #0
+        lsr
+        lsr
+        ora #$80
+        sta t+5
+        eor #$20
+        sta t+11       
+xoffm56:lda #0
+        clc
+        sbc x_dat+$307,x
+        lsr
+        lsr
+        ora #$80
+        sta t+7
+        eor #$20                
+        sta t+9
+        lda (t+4),y        
+        cmp $5e04,x
+        beq +        
+        `drawpix
+        sta $5e04,x
+        sta $5e05,x        
+        sta $5e06,x
+        sta $5e07,x        
+*       lda (t+8),y        
+        cmp $6000,x
+        beq +        
+        `drawpix
+        sta $6000,x
+        sta $6001,x        
+        sta $6002,x
+        sta $6003,x        
+*       ldx x_2
+        lda (t+6),y        
+        cmp $5f04,x
+        beq +        
+        `drawpix
+        sta $5f04,x
+        sta $5f05,x        
+        sta $5f06,x
+        sta $5f07,x        
+*       lda (t+10),y        
+        cmp $6100,x
+        beq +        
+        `drawpix
+        sta $6100,x
+        sta $6101,x        
+        sta $6102,x
+        sta $6103,x        
+
+
+*       rts
+
+
+
+
+
+plotmap_real:
+        lda #4
+        sta $f4
+        sta $fe30
+
+        lda BANK
+        and #$fb
+        sta $fe34 ;Enable main memory at $3000-$8000
+        
+        lda YOFF
+        lsr
+        lsr
+        clc
+        adc #60
+        and #60
+        asl
+        asl
+        sta scraddr
+        lda #$80
+        sta scraddr+1
+        
+        lda #0
+        sta mapaddr+1
+        lda MAPY
+        clc
+        adc #15
+;        and #31
+        asl
+        rol mapaddr+1
+        asl
+        rol mapaddr+1
+        asl
+        rol mapaddr+1
+        asl
+        rol mapaddr+1
+        clc
+        adc #<map
+        sta mapaddr
+        lda mapaddr+1
+        adc #>map
+        sta mapaddr+1
+        
+        lda YOFF
+        clc
+        adc #240
+        and #240
+        sta mapdat_addr
+        lda #>mapdat
+        sta mapdat_addr+1
+        
+        lda #16
+        sta t+1
+mapxloop2:
+        lda #7
+        sta $f4
+        sta $fe30
+        ldy #0
+        sty tileaddr+1
+        lda (mapaddr),y
+        sta (mapdat_addr),y
+        asl
+        rol tileaddr+1
+        asl
+        rol tileaddr+1
+        asl
+        rol tileaddr+1
+        asl
+        rol tileaddr+1
+        asl
+        rol tileaddr+1
+        clc
+        adc #<tiles
+        sta tileaddr
+        lda tileaddr+1
+        adc #>tiles
+        sta tileaddr+1
+
+        ldx #8
+        lda #4
+        sta $f4
+        sta $fe30
+plotinlp2:    
+        ldy #0            
+        lda (tileaddr),y
+        .byte STA_INDZP, scraddr
+        iny
+        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+        inc scraddr+1
+        
+        ldy #1
+        lda (tileaddr),y
+        ldy #0
+        .byte STA_INDZP, scraddr
+        iny
+        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+        inc scraddr+1
+        
+        ldy #2
+        lda (tileaddr),y
+        ldy #0
+        .byte STA_INDZP, scraddr
+        iny
+        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+        inc scraddr+1
+        
+        ldy #3
+        lda (tileaddr),y
+        ldy #0
+        .byte STA_INDZP, scraddr
+        iny
+        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+        
+        lda scraddr+1
+        sec
+        sbc #3
+        sta scraddr+1
+
+        lda scraddr
+        clc
+        adc #2
+        sta scraddr        
+        
+        lda tileaddr
+        clc
+        adc #4
+        sta tileaddr
+        dex
+        bne plotinlp2
+                
+        
+        lda scraddr+1
+        clc
+        adc #4
+        sta scraddr+1
+        lda scraddr
+        sec
+        sbc #16
+        sta scraddr
+        inc mapaddr
+        inc mapdat_addr
+                
+        dec t+1
+        beq +
+        jmp mapxloop2                        
+*
+        rts
+
+.checkpc $4800

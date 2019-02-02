@@ -1,0 +1,486 @@
+;Parasite-side loader
+
+.org $1900
+
+.alias OSWRCH $ffee
+.alias OSWORD $fff1
+.alias OSBYTE $fff4
+.alias OSCLI $fff7
+
+.alias scraddr $50
+.alias tileaddr $54
+
+.alias t $70
+
+.alias x_1 $40
+.alias x_2 $41
+
+.alias XOFF $42
+.alias YOFF $43
+
+.alias TUBE_CNT $4f
+
+.alias temp_map_data $90
+
+.alias last_command $20
+
+.alias BIT_IMM   $89
+.alias LDA_INDZP $b2
+.alias STA_INDZP $92
+.alias ADC_INDZP $72
+.alias JMP_INDX  $7c
+.alias PHX       $da
+.alias PHY       $5a
+.alias PLX       $fa
+.alias PLY       $7a
+.alias DEC_A     $3a
+.alias INC_A     $1a
+.alias STZ_ZP    $64
+
+.alias drawtube $2e00
+.alias y_dat $4000
+.alias x_dat $4800
+
+
+start:
+        lda #22
+        jsr OSWRCH
+        lda #2
+        jsr OSWRCH
+
+        lda t
+        cmp #1
+        bne +
+        
+        ldx #<plldstr
+        ldy #>plldstr
+        jsr OSCLI
+
+*       lda t
+        cmp #2
+        bne +
+
+        ldx #<plldhstr
+        ldy #>plldhstr
+        jsr OSCLI
+        
+*       lda t
+        cmp #1
+        beq ++
+        cmp #2
+        beq ++
+        
+*       jmp -
+*
+        ldx #<lldstr
+        ldy #>lldstr
+        jsr OSCLI
+
+        ldx #<ldstr
+        ldy #>ldstr
+        jsr OSCLI
+
+
+        ldx #<oswrblk
+        ldy #>oswrblk
+        lda #5
+        jsr OSWORD
+        
+        sta $70
+        inc oswrblk
+        
+        ldx #<oswrblk
+        ldy #>oswrblk
+        lda #5
+        jsr OSWORD
+
+        lda #$a
+        sta oswrblk+1
+        lda #$ff
+        sta oswrblk
+        ldx #<oswrblk
+        ldy #>oswrblk
+        lda #6
+        jsr OSWORD
+        
+        lda $70
+        sta oswrblk+4
+        dec oswrblk
+        ldx #<oswrblk
+        ldy #>oswrblk
+        lda #6
+        jsr OSWORD
+        
+        lda #$e
+        sta oswrblk
+        lda #$2
+        sta oswrblk+1
+        lda #0
+        sta oswrblk+4
+        ldx #<oswrblk
+        ldy #>oswrblk
+        lda #6
+        jsr OSWORD
+
+        inc oswrblk
+        lda #$a
+        sta oswrblk+4        
+        ldx #<oswrblk
+        ldy #>oswrblk
+        lda #6
+        jsr OSWORD
+
+        lda #65
+        jsr OSWRCH
+        
+        sei
+
+*       lda $fef8 ;Clear out port 1
+        bpl +
+        lda $fef9
+        jmp -       
+
+*       lda $fefa ;Clear out port 2
+        bpl +
+        lda $fefb
+        jmp -        
+
+*       lda $fefc ;Clear out port 3
+        bpl +
+        lda $fefd
+        jmp -        
+
+*       lda $fefe ;Clear out port 4
+        bpl +
+        lda $feff
+        jmp -
+*        
+
+        ldx #0
+        ldy #0
+*       nop
+        nop
+        dex
+        bne -
+        dey
+        bne -
+        
+        lda #$a5
+        sta TUBE_CNT
+        sta $feff
+
+main_loop:
+;        jsr tube_getbyte                        
+        lda $fefe ;Wait for command on port 4
+        bpl main_loop
+
+        lda #0
+        sta $fefb
+
+        lda $feff
+        sta last_command
+        
+        cmp #$a0
+        bne +
+        jmp do_render
+        
+*       cmp #$a1
+        bne +
+        jmp do_map_update
+
+*       jmp main_loop
+
+do_render:
+        jsr tube_getbyte
+        sta XOFF
+        jsr tube_getbyte
+        sta YOFF        
+;        jsr tube_getbyte
+;        sta x_1
+;
+;        cmp #0
+;        bne +
+;
+;        lda #$ad ;LDA abs
+;        sta drawmod24
+;        sta drawmod25
+;        sta drawmod26
+;        sta drawmod27
+;        sta drawmod29
+;
+;*       cmp #192
+;        bne +
+;        lda #$60 ;RTS
+;        sta drawmod24
+;*       cmp #200
+;        bne +
+;        lda #$60 ;RTS
+;        sta drawmod25
+;*       cmp #208
+;        bne +
+;        lda #$60 ;RTS
+;        sta drawmod26        
+;*       cmp #216
+;        bne +
+;        lda #$60 ;RTS
+;        sta drawmod27
+;*       cmp #232
+;        bne +
+;        lda #$60 ;RTS
+;        sta drawmod29
+;*
+
+        jsr drawtube
+
+
+
+
+
+
+
+        
+;        sta do_render_mod+1
+;        ora #$80
+;        sta do_render_mod+2
+;        
+;        ldx #0
+;        
+;*       lda $fef8
+;        and #$40
+;        beq -
+;
+;do_render_mod: lda $8000,x
+;        sta $fef9        
+;;        stx $fef9
+;        inx
+;        cpx #112
+;        bne -
+
+        jmp main_loop
+
+
+tube_getbyte:
+        lda $fefe
+        bpl tube_getbyte
+        
+        lda $feff
+        rts
+
+tube_sendbyte:
+        tax
+        
+*       lda $fef8
+        and #$40
+        beq -
+        
+        stx $fef9
+        
+        rts
+
+
+do_map_update:
+        jsr tube_getbyte
+        sta YOFF
+
+        jsr plotmap
+        jmp main_loop
+                
+ldstr: .byte "LOAD LOADER FFFF0A00",13
+plldstr:  .byte "LOAD TUBELO 00002E00",13
+plldhstr: .byte "LOAD TUBEHI 00002E00",13
+;plldhstr: .byte "LOAD TUBEULT 00003000",13
+
+lldstr:  .byte "LOAD LEV1 00005000",13
+
+oswrblk:
+        .word $020e, $ffff
+        .byte $0
+        
+        
+
+
+plotmap:
+        ldx #16
+*       jsr tube_getbyte
+        sta temp_map_data-1,x
+        dex
+        bne -
+        
+        lda YOFF
+        lsr
+        lsr
+        clc
+        adc #60
+        and #60
+        asl
+        asl
+        sta scraddr
+        lda #$80
+        sta scraddr+1
+               
+        lda #16
+        sta t+1
+mapxloop2:
+        ldy #0
+        sty tileaddr+1
+        
+        ldx t+1
+        lda temp_map_data-1, x
+;        jsr tube_getbyte
+        asl
+        rol tileaddr+1
+        asl
+        rol tileaddr+1
+        asl
+        rol tileaddr+1
+        asl
+        rol tileaddr+1
+        asl
+        rol tileaddr+1
+        clc
+        adc #<tiles
+        sta tileaddr
+        lda tileaddr+1
+        adc #>tiles
+        sta tileaddr+1
+
+        ldx #8
+plotinlp2:    
+        ldy #0            
+        lda (tileaddr),y
+        .byte STA_INDZP, scraddr
+        iny
+        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+        inc scraddr+1
+        
+        ldy #1
+        lda (tileaddr),y
+        ldy #0
+        .byte STA_INDZP, scraddr
+        iny
+        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+        inc scraddr+1
+        
+        ldy #2
+        lda (tileaddr),y
+        ldy #0
+        .byte STA_INDZP, scraddr
+        iny
+        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+        inc scraddr+1
+        
+        ldy #3
+        lda (tileaddr),y
+        ldy #0
+        .byte STA_INDZP, scraddr
+        iny
+        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+;        iny
+;        sta (scraddr),y
+        
+        lda scraddr+1
+        sec
+        sbc #3
+        sta scraddr+1
+
+        lda scraddr
+        clc
+        adc #2
+        sta scraddr        
+        
+        lda tileaddr
+        clc
+        adc #4
+        sta tileaddr
+        dex
+        bne plotinlp2
+                
+        
+        lda scraddr+1
+        clc
+        adc #4
+        sta scraddr+1
+        lda scraddr
+        sec
+        sbc #16
+        sta scraddr
+                
+        dec t+1
+        beq +
+        jmp mapxloop2                        
+*
+        rts
+
+;.include "TUBEHI"        
+.checkpc $2e00
+.advance $2e00
+
+.checkpc $5000        
+.advance $5000
+tiles:
+;.incbin "lev1"
+        .byte $00,$00,$00,$00
+        .byte $00,$00,$00,$00
+        .byte $00,$00,$00,$00
+        .byte $00,$00,$00,$00
+        
+        .byte $03,$03,$03,$03
+        .byte $03,$03,$03,$03
+        .byte $03,$03,$03,$03
+        .byte $03,$03,$03,$03
+        
+        .byte $07,$07,$07,$07
+        .byte $07,$07,$07,$07
+        .byte $07,$07,$07,$07
+        .byte $07,$07,$07,$07
+                
+        .byte $00,$00,$00,$0f
+        .byte $00,$00,$0f,$07
+        .byte $00,$0f,$07,$07
+        .byte $0f,$07,$07,$07
+
+        .byte $0f,$00,$00,$00
+        .byte $07,$0f,$00,$00
+        .byte $07,$07,$0f,$00
+        .byte $07,$07,$07,$0f
+
+        .byte $0f,$07,$07,$07
+        .byte $00,$0f,$07,$07
+        .byte $00,$00,$0f,$07
+        .byte $00,$00,$00,$0f
+
+        .byte $07,$07,$07,$0f
+        .byte $07,$07,$0f,$00
+        .byte $07,$0f,$00,$00
+        .byte $0f,$00,$00,$00
+
+        .byte $0f,$0f,$0f,$0f
+        .byte $0f,$03,$03,$0f
+        .byte $0f,$03,$03,$0f
+        .byte $0f,$0f,$0f,$0f
+
+        .byte $0f,$07,$07,$07
+        .byte $0f,$07,$07,$07
+        .byte $0f,$07,$07,$07
+        .byte $0f,$07,$07,$07
+
+        .byte $07,$07,$07,$0f
+        .byte $07,$07,$07,$0f
+        .byte $07,$07,$07,$0f
+        .byte $07,$07,$07,$0f
+
+

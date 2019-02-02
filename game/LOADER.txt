@@ -1,0 +1,120 @@
+;Host-side loader
+
+.org $a00
+
+.alias OSCLI $fff7
+
+.alias t $70
+
+start:
+;        cmp #$aa
+;        beq +
+;        
+;        jmp ($afe)
+        lda t        
+        beq +
+        
+	;Dual processor version is running - wait for sync from parasite
+        lda #$0f
+        sta $fee0
+
+wait_loop:
+        lda $fee7
+        cmp #$a5
+        bne wait_loop
+
+        
+*       ldx #<srldstr
+        ldy #>srldstr
+        jsr OSCLI
+
+        lda #5
+        sta $f4
+        sta $fe30
+
+        jsr swramcopy
+
+
+        ldx #<srldstr2
+        ldy #>srldstr2
+        jsr OSCLI
+
+        lda #6
+        sta $f4
+        sta $fe30
+
+        jsr swramcopy
+
+
+        ldx #<srldstr3
+        ldy #>srldstr3
+        jsr OSCLI
+
+        lda #7
+        sta $f4
+        sta $fe30
+
+        jsr swramcopy
+
+
+        ldx #<ldstr
+        ldy #>ldstr
+        jsr OSCLI
+
+        lda t
+        bne +
+        
+        ldx #<plldmstr
+        ldy #>plldmstr
+        jsr OSCLI
+
+*       lda t
+        cmp #1
+        bne +
+        
+        ldx #<plldstr
+        ldy #>plldstr
+        jsr OSCLI
+
+*       lda t
+        cmp #2
+        bne +
+        
+        ldx #<plldhstr
+        ldy #>plldhstr
+        jsr OSCLI
+        
+*       jmp $e00
+
+
+swramcopy:
+        ldy #0
+        sty t+1
+        sty t+3
+
+        lda #$80
+        sta t+4
+        lda #$40
+        sta t+2
+        
+*       lda (t+1),y
+        sta (t+3),y
+        iny
+        bne -
+        inc t+4
+        inc t+2
+        bpl -
+        
+        rts
+        
+
+
+ldstr: .byte "LOAD TUBE FFFF0E00",13
+srldstr: .byte "LOAD SPRITE5 FFFF4000",13
+srldstr2: .byte "LOAD SPRITE6 FFFF4000",13
+srldstr3: .byte "LOAD LEV1 FFFF4000",13
+
+.advance $b08
+plldstr:  .byte "LOAD PLOTLO FFFF2B00",13
+plldhstr: .byte "LOAD PLOTHI FFFF2B00",13
+plldmstr: .byte "LOAD PLOTM FFFF2B00",13

@@ -1,0 +1,142 @@
+;Initial loader. Displays menu if a second processor is fitted
+
+;On a single processor system this will simply run LOADER
+;On a dual processor system this will load LOADER on the host, then run LOADT on the parasite
+
+;'t' at $70 is used as a flag by LOADER to determine if the single or dual processor
+;version is running
+
+.org $1900
+
+.alias OSWRCH $ffee
+.alias OSWORD $fff1
+.alias OSBYTE $fff4
+.alias OSCLI  $fff7
+
+.alias t $70
+
+start:  lda #200
+        ldx #3
+        ldy #0
+        jsr OSBYTE
+        
+        lda #$ea
+        ldx #0
+        ldy #$ff
+        jsr OSBYTE
+        cpx #0
+        bne +
+
+        ;Single processor system - just boot game
+        lda #22
+        jsr OSWRCH
+        lda #2
+        jsr OSWRCH
+
+        ldx #<ldstr
+        ldy #>ldstr
+        jsr OSCLI
+
+        jmp $a00
+
+        ;Display menu
+*       lda #0
+        sta $70
+*       ldx $70
+        lda text,x
+        beq +
+        jsr OSWRCH
+        inc $70
+        jmp -
+        
+*       lda #$81
+        ldx #$ff
+        ldy #$7f
+        jsr OSBYTE
+
+        bcs -
+        
+        cpx #48+1
+        beq load1
+        cpx #48+2
+        beq load2
+        cpx #48+3
+        beq load3
+
+        jmp -
+
+load1:  ldx #0
+        stx t
+
+        lda #22
+        jsr OSWRCH
+        lda #2
+        jsr OSWRCH
+
+        ldx #<ldstr
+        ldy #>ldstr
+        jsr OSCLI
+        
+        lda #$ea
+        ldx #0
+        ldy #$ff
+        jsr OSBYTE
+        cpx #0
+        bne +
+
+        ;Single processor, just jump        
+        jmp $a00
+        
+*       ;Running on parasite processor. Write start address to USERV and *CODE
+        ldx #<oswrblk
+        ldy #>oswrblk
+        lda #6
+        jsr OSWORD
+
+        inc oswrblk
+        lda #$a
+        sta oswrblk+4        
+        ldx #<oswrblk
+        ldy #>oswrblk
+        lda #6
+        jsr OSWORD
+
+        lda #$88   ;Jump to (USERV)
+        jsr OSBYTE       
+
+*       jmp -
+
+oswrblk:
+        .word $0200, $0000
+        .byte $00
+
+load2:
+load3:  txa
+        sec
+        sbc #48+1
+        sta t
+
+       
+        sta oswrblk+4
+        ldx #$70
+        stx oswrblk
+        ldx #0
+        stx oswrblk+1
+        ldx #<oswrblk
+        ldy #>oswrblk
+        lda #6
+        jsr OSWORD
+        
+        ldx #<ldtstr
+        ldy #>ldtstr
+        jsr OSCLI
+*       jmp -
+
+text:
+        .byte "1. Master",10,13
+        .byte "2. Master + 6502 copro (low res)",10,13
+        .byte "3. Master + 6502 copro (high res)",10,13
+        .byte 0
+        
+ldstr: .byte "LOAD LOADER FFFF0A00",13
+ldtstr: .byte "/LOADT",13

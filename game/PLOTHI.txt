@@ -1,0 +1,1363 @@
+;Hi-res dual CPU tube plotter (host side). Plots at 2x2 resolution in MODE 2
+
+.org $2b00
+
+.alias MAPY $40
+
+.alias scraddr $50
+.alias mapaddr $52
+.alias tileaddr $54
+.alias spraddr $56
+.alias sprdat_addr $58
+.alias mapdat_addr $5a
+
+.alias BANK $61
+
+.alias t $70
+
+.alias x_1 $80
+.alias x_2 $81
+
+.alias XOFF $c30
+.alias YOFF $c34
+.alias YOFF_OLD $c38
+.alias YOFFL $c3c
+.alias XOFFL $c40
+.alias YOFFH $c44
+
+;.alias XOFF $82
+;.alias YOFF $83
+;.alias YOFF_OLD $84
+;.alias YOFFL $85
+;.alias XOFFL $86
+;.alias YOFFH $87
+
+.alias mapdat $400
+
+.alias map $8400
+
+plotmap:
+        jmp plotmap_real
+        
+drawtube:
+        ldx #0
+        jsr drawcolumn
+        ldx #8
+        jsr drawcolumn
+        ldx #16
+        jsr drawcolumn
+        ldx #24
+        jsr drawcolumn
+        ldx #32
+        jsr drawcolumn
+        ldx #40
+        jsr drawcolumn
+        ldx #48
+        jsr drawcolumn
+        ldx #56
+        jsr drawcolumn
+        ldx #64
+        jsr drawcolumn
+        ldx #72
+        jsr drawcolumn
+        ldx #80
+        jsr drawcolumn
+        ldx #88
+        jsr drawcolumn
+        ldx #96
+        jsr drawcolumn
+        ldx #104
+        jsr drawcolumn
+        ldx #112
+        jsr drawcolumn
+        ldx #120
+        jsr drawcolumn
+        ldx #128
+        jsr drawcolumn
+        ldx #136
+        jsr drawcolumn
+        ldx #144
+        jsr drawcolumn
+        ldx #152
+        jsr drawcolumn
+        ldx #160
+        jsr drawcolumn
+        ldx #168
+        jsr drawcolumn
+        ldx #176
+        jsr drawcolumn
+        ldx #184
+        jsr drawcolumn
+        ldx #192
+        jsr drawcolumn
+        ldx #200
+        jsr drawcolumn
+        ldx #208
+        jsr drawcolumn
+        lda #$60 ;RTS
+        sta drawmod30
+        ldx #216
+        jsr drawcolumn
+        lda #$60 ;RTS
+        sta drawmod28
+        ldx #224
+        jsr drawcolumn
+        ldx #232
+        jsr drawcolumn
+        lda #$60 ;RTS
+        sta drawmod27
+        ldx #240
+        jsr drawcolumn
+        ldx #248
+        jsr drawcolumn
+        
+;        lda #$A6 ;LDX zp
+        lda #$a9 ;LDA imm
+        sta drawmod27
+        sta drawmod28
+        sta drawmod30
+
+        rts
+
+drawcolumn:
+        lda #0
+        sta t+4
+        sta t+6
+        sta t+8
+        sta t+10
+        
+        stx x_1
+        lda #248
+        sec
+        sbc x_1
+        sta x_2
+
+        lda #28
+        sta $fee3
+
+        ldx x_1
+        bne +
+
+        lda #$a0
+        jsr tube_sendbyte
+        lda XOFF
+        jsr tube_sendbyte
+        lda YOFF
+        jsr tube_sendbyte
+;        lda x_1
+;        jsr tube_sendbyte
+*
+
+;        sta $fee7
+
+
+;        ldx x_1            ;3
+;        lda y_dat+$000,x   ;4
+;        clc                ;2
+;        adc YOFF           ;3
+;        and #$fc           ;2
+;        tay                ;2 = 18
+;        lda x_dat+$000,x   ;4
+;        clc                ;2
+;        adc XOFF           ;3
+;        lsr                ;2
+;        lsr                ;2
+;        ora #$80           ;2
+;        sta t+5            ;3
+;        eor #$20           ;2
+;        sta t+11           ;3 = 23
+;        lda XOFF           ;3
+;        clc                ;2
+;        sbc x_dat+$000,x   ;4
+;        lsr                ;2
+;        lsr                ;2
+;        ora #$80           ;2
+;        sta t+7            ;3
+;        eor #$20           ;2     
+;        sta t+9            ;3 = 23
+;        lda (t+4),y        ;5
+;        sta $4000,x        ;5
+;        sta $4001,x        ;5
+;        sta $4002,x        ;5
+;        sta $4003,x        ;5 = 28
+;        lda (t+8),y        ;5
+;        sta $7e04,x        ;5
+;        sta $7e05,x        ;5
+;        sta $7e06,x        ;5
+;        sta $7e07,x        ;5 = 25
+;        ldx x_2            ;3
+;        lda (t+6),y        ;5
+;        sta $4100,x        ;5
+;        sta $4101,x        ;5
+;        sta $4102,x        ;5
+;        sta $4103,x        ;5 = 28
+;        lda (t+10),y       ;5 
+;        sta $7f04,x        ;5
+;        sta $7f05,x        ;5
+;        sta $7f06,x        ;5
+;        sta $7f07,x        ;5 = 25
+                           ; = 168 cycles for 4 pixels
+                           ; 4096 pixels = 172032 cycles per frame = 11.63 fps
+                           ; 4096-208 = 3888 pixels = 163296 cycles per frame = 12.25 fps
+                           ; 3584-208 = 3376 pixels = 141792 cycles per frame = 14.11 fps  
+
+
+;        ldx x_1            ;3
+;        ldy x_dat+$000,x   ;4
+;        lda xoff2_dat,y    ;4
+;        sta t+7            ;3
+;        eor #$20           ;2
+;        sta t+9            ;3 = 19
+
+;        ldy x_dat+$000,x   ;4
+;        lda xoff_dat,y     ;4
+;        sta t+5            ;3
+;        eor #$20           ;2
+;        sta t+11           ;3 = 16
+
+;        ldy y_dat+$000,x   ;4
+;        lda yoff_dat,y     ;4
+;        tay                ;2 = 10
+
+;        lda (t+4),y        ;5
+;        sta $4000,x        ;5
+;        sta $4001,x        ;5
+;        sta $4002,x        ;5
+;        sta $4003,x        ;5 = 28
+;        lda (t+8),y        ;5
+;        sta $7e04,x        ;5
+;        sta $7e05,x        ;5
+;        sta $7e06,x        ;5
+;        sta $7e07,x        ;5 = 25
+;        ldx x_2            ;3
+;        lda (t+6),y        ;5
+;        sta $4100,x        ;5
+;        sta $4101,x        ;5
+;        sta $4102,x        ;5
+;        sta $4103,x        ;5 = 28
+;        lda (t+10),y       ;5 
+;        sta $7f04,x        ;5
+;        sta $7f05,x        ;5
+;        sta $7f06,x        ;5
+;        sta $7f07,x        ;5 = 25
+                           ; = 151 cycles for 4 pixels
+                           ; 3584-208 = 3376 pixels = 127444 cycles per frame = 15.69 fps
+                           ; + 14848 cycles = 142292 cycles per frame
+                           
+;*       txa                ;2
+;        clc                ;2
+;        adc #0 ;XOFF       ;2
+;        lsr                ;2
+;        lsr                ;2
+;        ora #$80           ;2
+;        sta xoff_dat,x     ;5 = 17
+;        
+;        lda #0 ;XOFF       ;2
+;        clc                ;2
+;        sbc array_full,x   ;4
+;        lsr                ;2
+;        lsr                ;2
+;        ora #$80           ;2
+;        sta xoff2_dat,x    ;5 = 19
+;
+;        txa                ;2
+;        clc                ;2
+;        adc #0 ;YOFF       ;2
+;        lsr                ;2
+;        lsr                ;2
+;        sta yoff_dat,x     ;5 = 17
+;        
+;        inx                ;2
+;        bne -              ;3 = 5        
+;;                          17+19+17+5 = 14848 cycles 
+
+;        ldx x_1
+;        lda y_dat+$001,x
+;        clc
+;        adc YOFF
+;        lsr
+;        lsr
+;        tay
+;        lda x_dat+$001,x                                                          
+;        clc
+;        adc XOFF
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+5
+;        eor #$20
+;        sta t+11       
+;        lda XOFF
+;        clc
+;        sbc x_dat+$001,x
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+7
+;        eor #$20                
+;        sta t+9
+;        lda (t+4),y        
+;        sta $4004,x
+;        sta $4005,x        
+;        sta $4006,x
+;        sta $4007,x        
+;        lda (t+8),y        
+;        sta $7e00,x
+;        sta $7e01,x        
+;        sta $7e02,x
+;        sta $7e03,x        
+;        ldx x_2
+;        lda (t+6),y        
+;        sta $4104,x
+;        sta $4105,x        
+;        sta $4106,x
+;        sta $4107,x        
+;        lda (t+10),y        
+;        sta $7f00,x
+;        sta $7f01,x        
+;        sta $7f02,x
+;        sta $7f03,x        
+
+;        ldx x_1
+;        lda y_dat+$002,x
+;        clc
+;        adc YOFF
+;        lsr
+;        lsr
+;        tay
+;        lda x_dat+$002,x
+;        clc
+;        adc XOFF
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+5
+;        eor #$20
+;        sta t+11       
+;        lda XOFF
+;        clc
+;        sbc x_dat+$002,x
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+7
+;        eor #$20                
+;        sta t+9
+;        lda (t+4),y        
+;        sta $4200,x
+;        sta $4201,x        
+;        sta $4202,x
+;        sta $4203,x        
+;        lda (t+8),y        
+;        sta $7c04,x
+;        sta $7c05,x        
+;        sta $7c06,x
+;        sta $7c07,x        
+;        ldx x_2
+;        lda (t+6),y        
+;        sta $4300,x
+;        sta $4301,x        
+;        sta $4302,x
+;        sta $4303,x        
+;        lda (t+10),y        
+;        sta $7d04,x
+;        sta $7d05,x        
+;        sta $7d06,x
+;        sta $7d07,x        
+
+;        ldx x_1
+;        lda y_dat+$003,x
+;        clc
+;        adc YOFF
+;        lsr
+;        lsr
+;        tay
+;        lda x_dat+$003,x
+;        clc
+;        adc XOFF
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+5
+;        eor #$20
+;        sta t+11       
+;        lda XOFF
+;        clc
+;        sbc x_dat+$003,x
+;        lsr
+;        lsr
+;        ora #$80
+;        sta t+7
+;        eor #$20                
+;        sta t+9
+;        lda (t+4),y        
+;        sta $4204,x
+;        sta $4205,x        
+;        sta $4206,x
+;        sta $4207,x        
+;        lda (t+8),y        
+;        sta $7c00,x
+;        sta $7c01,x        
+;        sta $7c02,x
+;        sta $7c03,x        
+;        ldx x_2
+;        lda (t+6),y        
+;        sta $4304,x
+;        sta $4305,x        
+;        sta $4306,x
+;        sta $4307,x        
+;        lda (t+10),y        
+;        sta $7d00,x
+;        sta $7d01,x        
+;        sta $7d02,x
+;        sta $7d03,x        
+
+        ldx x_1
+        ldy x_2
+
+*       lda $fee3
+        beq -
+        cmp #28
+        beq -
+        lda #0
+        sta $fee3
+
+        lda $fee1
+        sta $4400,x
+        sta $4401,x        
+        lda $fee1        
+        sta $7a06,x
+        sta $7a07,x        
+        lda $fee1        
+        sta $4500,y
+        sta $4501,y        
+        lda $fee1        
+        sta $7b06,y
+        sta $7b07,y        
+        lda $fee1
+        sta $4402,x
+        sta $4403,x        
+        lda $fee1
+        sta $7a04,x
+        sta $7a05,x        
+        lda $fee1
+        sta $4502,y
+        sta $4503,y        
+        lda $fee1
+        sta $7b04,y
+        sta $7b05,y        
+
+        lda #1
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $4404,x
+        sta $4405,x        
+        lda $fee1        
+        sta $7a02,x
+        sta $7a03,x        
+        lda $fee1        
+        sta $4504,y
+        sta $4505,y        
+        lda $fee1        
+        sta $7b02,y
+        sta $7b03,y        
+        lda $fee1
+        sta $4406,x
+        sta $4407,x        
+        lda $fee1
+        sta $7a00,x
+        sta $7a01,x        
+        lda $fee1
+        sta $4506,y
+        sta $4507,y        
+        lda $fee1
+        sta $7b00,y
+        sta $7b01,y        
+
+        lda #2
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $4600,x
+        sta $4601,x        
+        lda $fee1        
+        sta $7806,x
+        sta $7807,x        
+        lda $fee1        
+        sta $4700,y
+        sta $4701,y        
+        lda $fee1        
+        sta $7906,y
+        sta $7907,y        
+        lda $fee1
+        sta $4602,x
+        sta $4603,x        
+        lda $fee1
+        sta $7804,x
+        sta $7805,x        
+        lda $fee1
+        sta $4702,y
+        sta $4703,y        
+        lda $fee1
+        sta $7904,y
+        sta $7905,y        
+
+        lda #3
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $4604,x
+        sta $4605,x        
+        lda $fee1        
+        sta $7802,x
+        sta $7803,x        
+        lda $fee1        
+        sta $4704,y
+        sta $4705,y        
+        lda $fee1        
+        sta $7902,y
+        sta $7903,y        
+        lda $fee1
+        sta $4606,x
+        sta $4607,x        
+        lda $fee1
+        sta $7800,x
+        sta $7801,x        
+        lda $fee1
+        sta $4706,y
+        sta $4707,y        
+        lda $fee1
+        sta $7900,y
+        sta $7901,y        
+
+        lda #4
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $4800,x
+        sta $4801,x        
+        lda $fee1        
+        sta $7606,x
+        sta $7607,x        
+        lda $fee1        
+        sta $4900,y
+        sta $4901,y        
+        lda $fee1        
+        sta $7706,y
+        sta $7707,y        
+        lda $fee1
+        sta $4802,x
+        sta $4803,x        
+        lda $fee1
+        sta $7604,x
+        sta $7605,x        
+        lda $fee1
+        sta $4902,y
+        sta $4903,y        
+        lda $fee1
+        sta $7704,y
+        sta $7705,y        
+
+        lda #5
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $4804,x
+        sta $4805,x        
+        lda $fee1        
+        sta $7602,x
+        sta $7603,x        
+        lda $fee1        
+        sta $4904,y
+        sta $4905,y        
+        lda $fee1        
+        sta $7702,y
+        sta $7703,y        
+        lda $fee1
+        sta $4806,x
+        sta $4807,x        
+        lda $fee1
+        sta $7600,x
+        sta $7601,x        
+        lda $fee1
+        sta $4906,y
+        sta $4907,y        
+        lda $fee1
+        sta $7700,y
+        sta $7701,y        
+
+        lda #6
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $4a00,x
+        sta $4a01,x        
+        lda $fee1        
+        sta $7406,x
+        sta $7407,x        
+        lda $fee1        
+        sta $4b00,y
+        sta $4b01,y        
+        lda $fee1        
+        sta $7506,y
+        sta $7507,y        
+        lda $fee1
+        sta $4a02,x
+        sta $4a03,x        
+        lda $fee1
+        sta $7404,x
+        sta $7405,x        
+        lda $fee1
+        sta $4b02,y
+        sta $4b03,y        
+        lda $fee1
+        sta $7504,y
+        sta $7505,y        
+
+        lda #7
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $4a04,x
+        sta $4a05,x        
+        lda $fee1        
+        sta $7402,x
+        sta $7403,x        
+        lda $fee1        
+        sta $4b04,y
+        sta $4b05,y        
+        lda $fee1        
+        sta $7502,y
+        sta $7503,y        
+        lda $fee1
+        sta $4a06,x
+        sta $4a07,x        
+        lda $fee1
+        sta $7400,x
+        sta $7401,x        
+        lda $fee1
+        sta $4b06,y
+        sta $4b07,y        
+        lda $fee1
+        sta $7500,y
+        sta $7501,y        
+
+        lda #8
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $4c00,x
+        sta $4c01,x        
+        lda $fee1        
+        sta $7206,x
+        sta $7207,x        
+        lda $fee1        
+        sta $4d00,y
+        sta $4d01,y        
+        lda $fee1        
+        sta $7306,y
+        sta $7307,y        
+        lda $fee1
+        sta $4c02,x
+        sta $4c03,x        
+        lda $fee1
+        sta $7204,x
+        sta $7205,x        
+        lda $fee1
+        sta $4d02,y
+        sta $4d03,y        
+        lda $fee1
+        sta $7304,y
+        sta $7305,y        
+
+        lda #9
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $4c04,x
+        sta $4c05,x        
+        lda $fee1        
+        sta $7202,x
+        sta $7203,x        
+        lda $fee1        
+        sta $4d04,y
+        sta $4d05,y        
+        lda $fee1        
+        sta $7302,y
+        sta $7303,y        
+        lda $fee1
+        sta $4c06,x
+        sta $4c07,x        
+        lda $fee1
+        sta $7200,x
+        sta $7201,x        
+        lda $fee1
+        sta $4d06,y
+        sta $4d07,y        
+        lda $fee1
+        sta $7300,y
+        sta $7301,y        
+
+        lda #10
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $4e00,x
+        sta $4e01,x        
+        lda $fee1        
+        sta $7006,x
+        sta $7007,x        
+        lda $fee1        
+        sta $4f00,y
+        sta $4f01,y        
+        lda $fee1        
+        sta $7106,y
+        sta $7107,y        
+        lda $fee1
+        sta $4e02,x
+        sta $4e03,x        
+        lda $fee1
+        sta $7004,x
+        sta $7005,x        
+        lda $fee1
+        sta $4f02,y
+        sta $4f03,y        
+        lda $fee1
+        sta $7104,y
+        sta $7105,y        
+
+        lda #11
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $4e04,x
+        sta $4e05,x        
+        lda $fee1        
+        sta $7002,x
+        sta $7003,x        
+        lda $fee1        
+        sta $4f04,y
+        sta $4f05,y        
+        lda $fee1        
+        sta $7102,y
+        sta $7103,y        
+        lda $fee1
+        sta $4e06,x
+        sta $4e07,x        
+        lda $fee1
+        sta $7000,x
+        sta $7001,x        
+        lda $fee1
+        sta $4f06,y
+        sta $4f07,y        
+        lda $fee1
+        sta $7100,y
+        sta $7101,y        
+
+        lda #12
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5000,x
+        sta $5001,x        
+        lda $fee1        
+        sta $6e06,x
+        sta $6e07,x        
+        lda $fee1        
+        sta $5100,y
+        sta $5101,y        
+        lda $fee1        
+        sta $6f06,y
+        sta $6f07,y        
+        lda $fee1
+        sta $5002,x
+        sta $5003,x        
+        lda $fee1
+        sta $6e04,x
+        sta $6e05,x        
+        lda $fee1
+        sta $5102,y
+        sta $5103,y        
+        lda $fee1
+        sta $6f04,y
+        sta $6f05,y        
+
+        lda #13
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5004,x
+        sta $5005,x        
+        lda $fee1        
+        sta $6e02,x
+        sta $6e03,x        
+        lda $fee1        
+        sta $5104,y
+        sta $5105,y        
+        lda $fee1        
+        sta $6f02,y
+        sta $6f03,y        
+        lda $fee1
+        sta $5006,x
+        sta $5007,x        
+        lda $fee1
+        sta $6e00,x
+        sta $6e01,x        
+        lda $fee1
+        sta $5106,y
+        sta $5107,y        
+        lda $fee1
+        sta $6f00,y
+        sta $6f01,y        
+
+        lda #14
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5200,x
+        sta $5201,x        
+        lda $fee1        
+        sta $6c06,x
+        sta $6c07,x        
+        lda $fee1        
+        sta $5300,y
+        sta $5301,y        
+        lda $fee1        
+        sta $6d06,y
+        sta $6d07,y        
+        lda $fee1
+        sta $5202,x
+        sta $5203,x        
+        lda $fee1
+        sta $6c04,x
+        sta $6c05,x        
+        lda $fee1
+        sta $5302,y
+        sta $5303,y        
+        lda $fee1
+        sta $6d04,y
+        sta $6d05,y        
+
+        lda #15
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5204,x
+        sta $5205,x        
+        lda $fee1        
+        sta $6c02,x
+        sta $6c03,x        
+        lda $fee1        
+        sta $5304,y
+        sta $5305,y        
+        lda $fee1        
+        sta $6d02,y
+        sta $6d03,y        
+        lda $fee1
+        sta $5206,x
+        sta $5207,x        
+        lda $fee1
+        sta $6c00,x
+        sta $6c01,x        
+        lda $fee1
+        sta $5306,y
+        sta $5307,y        
+        lda $fee1
+        sta $6d00,y
+        sta $6d01,y        
+
+        lda #16
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5400,x
+        sta $5401,x        
+        lda $fee1        
+        sta $6a06,x
+        sta $6a07,x        
+        lda $fee1        
+        sta $5500,y
+        sta $5501,y        
+        lda $fee1        
+        sta $6b06,y
+        sta $6b07,y        
+        lda $fee1
+        sta $5402,x
+        sta $5403,x        
+        lda $fee1
+        sta $6a04,x
+        sta $6a05,x        
+        lda $fee1
+        sta $5502,y
+        sta $5503,y        
+        lda $fee1
+        sta $6b04,y
+        sta $6b05,y        
+
+        lda #17
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5404,x
+        sta $5405,x        
+        lda $fee1        
+        sta $6a02,x
+        sta $6a03,x        
+        lda $fee1        
+        sta $5504,y
+        sta $5505,y        
+        lda $fee1        
+        sta $6b02,y
+        sta $6b03,y        
+        lda $fee1
+        sta $5406,x
+        sta $5407,x        
+        lda $fee1
+        sta $6a00,x
+        sta $6a01,x        
+        lda $fee1
+        sta $5506,y
+        sta $5507,y        
+        lda $fee1
+        sta $6b00,y
+        sta $6b01,y        
+
+        lda #18
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5600,x
+        sta $5601,x        
+        lda $fee1        
+        sta $6806,x
+        sta $6807,x        
+        lda $fee1        
+        sta $5700,y
+        sta $5701,y        
+        lda $fee1        
+        sta $6906,y
+        sta $6907,y        
+        lda $fee1
+        sta $5602,x
+        sta $5603,x        
+        lda $fee1
+        sta $6804,x
+        sta $6805,x        
+        lda $fee1
+        sta $5702,y
+        sta $5703,y        
+        lda $fee1
+        sta $6904,y
+        sta $6905,y        
+
+        lda #19
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5604,x
+        sta $5605,x        
+        lda $fee1        
+        sta $6802,x
+        sta $6803,x        
+        lda $fee1        
+        sta $5704,y
+        sta $5705,y        
+        lda $fee1        
+        sta $6902,y
+        sta $6903,y        
+        lda $fee1
+        sta $5606,x
+        sta $5607,x        
+        lda $fee1
+        sta $6800,x
+        sta $6801,x        
+        lda $fee1
+        sta $5706,y
+        sta $5707,y        
+        lda $fee1
+        sta $6900,y
+        sta $6901,y        
+
+        lda #20
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5800,x
+        sta $5801,x        
+        lda $fee1        
+        sta $6606,x
+        sta $6607,x        
+        lda $fee1        
+        sta $5900,y
+        sta $5901,y        
+        lda $fee1        
+        sta $6706,y
+        sta $6707,y        
+        lda $fee1
+        sta $5802,x
+        sta $5803,x        
+        lda $fee1
+        sta $6604,x
+        sta $6605,x        
+        lda $fee1
+        sta $5902,y
+        sta $5903,y        
+        lda $fee1
+        sta $6704,y
+        sta $6705,y        
+
+        lda #21
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5804,x
+        sta $5805,x        
+        lda $fee1        
+        sta $6602,x
+        sta $6603,x        
+        lda $fee1        
+        sta $5904,y
+        sta $5905,y        
+        lda $fee1        
+        sta $6702,y
+        sta $6703,y        
+        lda $fee1
+        sta $5806,x
+        sta $5807,x        
+        lda $fee1
+        sta $6600,x
+        sta $6601,x        
+        lda $fee1
+        sta $5906,y
+        sta $5907,y        
+        lda $fee1
+        sta $6700,y
+        sta $6701,y        
+
+        lda #22
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5a00,x
+        sta $5a01,x        
+        lda $fee1        
+        sta $6406,x
+        sta $6407,x        
+        lda $fee1        
+        sta $5b00,y
+        sta $5b01,y        
+        lda $fee1        
+        sta $6506,y
+        sta $6507,y        
+        lda $fee1
+        sta $5a02,x
+        sta $5a03,x        
+        lda $fee1
+        sta $6404,x
+        sta $6405,x        
+        lda $fee1
+        sta $5b02,y
+        sta $5b03,y        
+        lda $fee1
+        sta $6504,y
+        sta $6505,y        
+
+drawmod27:
+        lda #23
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5a04,x
+        sta $5a05,x        
+        lda $fee1        
+        sta $6402,x
+        sta $6403,x        
+        lda $fee1        
+        sta $5b04,y
+        sta $5b05,y        
+        lda $fee1        
+        sta $6502,y
+        sta $6503,y        
+        lda $fee1
+        sta $5a06,x
+        sta $5a07,x        
+        lda $fee1
+        sta $6400,x
+        sta $6401,x        
+        lda $fee1
+        sta $5b06,y
+        sta $5b07,y        
+        lda $fee1
+        sta $6500,y
+        sta $6501,y        
+
+drawmod28:
+        lda #24
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5c00,x
+        sta $5c01,x        
+        lda $fee1        
+        sta $6206,x
+        sta $6207,x        
+        lda $fee1        
+        sta $5d00,y
+        sta $5d01,y        
+        lda $fee1        
+        sta $6306,y
+        sta $6307,y        
+        lda $fee1
+        sta $5c02,x
+        sta $5c03,x        
+        lda $fee1
+        sta $6204,x
+        sta $6205,x        
+        lda $fee1
+        sta $5d02,y
+        sta $5d03,y        
+        lda $fee1
+        sta $6304,y
+        sta $6305,y        
+
+        lda #25
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5c04,x
+        sta $5c05,x        
+        lda $fee1        
+        sta $6202,x
+        sta $6203,x        
+        lda $fee1        
+        sta $5d04,y
+        sta $5d05,y        
+        lda $fee1        
+        sta $6302,y
+        sta $6303,y        
+        lda $fee1
+        sta $5c06,x
+        sta $5c07,x        
+        lda $fee1
+        sta $6200,x
+        sta $6201,x        
+        lda $fee1
+        sta $5d06,y
+        sta $5d07,y        
+        lda $fee1
+        sta $6300,y
+        sta $6301,y        
+
+drawmod30:
+        lda #26
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5e00,x
+        sta $5e01,x        
+        lda $fee1        
+        sta $6006,x
+        sta $6007,x        
+        lda $fee1        
+        sta $5f00,y
+        sta $5f01,y        
+        lda $fee1        
+        sta $6106,y
+        sta $6107,y        
+        lda $fee1
+        sta $5e02,x
+        sta $5e03,x        
+        lda $fee1
+        sta $6004,x
+        sta $6005,x        
+        lda $fee1
+        sta $5f02,y
+        sta $5f03,y        
+        lda $fee1
+        sta $6104,y
+        sta $6105,y        
+
+        lda #27
+        sta $fee3
+*       cmp $fee3
+        bcs -
+
+        lda $fee1
+        sta $5e04,x
+        sta $5e05,x        
+        lda $fee1        
+        sta $6002,x
+        sta $6003,x        
+        lda $fee1        
+        sta $5f04,y
+        sta $5f05,y        
+        lda $fee1        
+        sta $6102,y
+        sta $6103,y        
+        lda $fee1
+        sta $5e06,x
+        sta $5e07,x        
+        lda $fee1
+        sta $6000,x
+        sta $6001,x        
+        lda $fee1
+        sta $5f06,y
+        sta $5f07,y        
+        lda $fee1
+        sta $6100,y
+        sta $6101,y        
+
+        lda #28
+        sta $fee3
+
+        rts
+
+
+tube_sendbyte:
+        tax
+        
+*       lda $fee6
+        and #$40
+        beq -
+        
+        stx $fee7
+        
+        rts
+        
+tube_getbyte:
+        lda $fee0
+        bpl tube_getbyte
+        
+        lda $fee1
+        
+        rts
+        
+plotmap_real:
+        lda #$a1
+        jsr tube_sendbyte
+        lda YOFF
+        jsr tube_sendbyte
+
+        lda #7
+        sta $f4
+        sta $fe30
+
+        lda BANK
+        and #$fb
+        sta $fe34 ;Enable main memory at $3000-$8000
+        
+        lda YOFF
+        lsr
+        lsr
+        clc
+        adc #60
+        and #60
+        asl
+        asl
+        sta scraddr
+        lda #$80
+        sta scraddr+1
+        
+        lda #0
+        sta mapaddr+1
+        lda MAPY
+        clc
+        adc #15
+;        and #31
+        asl
+        rol mapaddr+1
+        asl
+        rol mapaddr+1
+        asl
+        rol mapaddr+1
+        asl
+        rol mapaddr+1
+        clc
+        adc #<map
+        sta mapaddr
+        lda mapaddr+1
+        adc #>map
+        sta mapaddr+1
+        
+        lda YOFF
+        clc
+        adc #240
+        and #240
+        sta mapdat_addr
+        lda #>mapdat
+        sta mapdat_addr+1
+        
+        lda #16
+        sta t+1
+mapxloop2:
+        ldy #0
+        sty tileaddr+1
+        lda (mapaddr),y
+;        sec
+;        sbc #65
+        sta (mapdat_addr),y
+        jsr tube_sendbyte
+
+        inc mapaddr
+        inc mapdat_addr
+                
+        dec t+1
+        beq +
+        jmp mapxloop2                        
+*
+        rts
+
+.checkpc $4800
